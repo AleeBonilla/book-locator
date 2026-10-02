@@ -9,13 +9,13 @@ El sistema ordena códigos de clasificación construidos a partir de:
 1. un prefijo local **opcional**;
 2. un número de clase de la Clasificación Decimal Dewey (DDC);
 3. un Cutter **opcional**;
-4. una marca de obra **opcional**.
+4. una edición **opcional**.
 
 ## 2. Contrato de entrada
 
 El ordenamiento recibe dos estructuras válidas producidas según [`normalization.md`](normalization.md), que es la única definición de sus campos, su segmentación y su validación. No recibe texto sin procesar.
 
-Utiliza `prefijo`, `ddc`, `cutter_letras`, `cutter_cifras` y `marca`. El Cutter es opcional; su ausencia se representa según ese contrato. Los ejemplos de este documento muestran códigos o componentes en forma legible para expresar relaciones de orden.
+Utiliza `prefijo`, `ddc`, `cutter_letras`, `cutter_cifras` y `edicion`. El Cutter es opcional; su ausencia se representa según ese contrato. Los ejemplos de este documento muestran códigos o componentes en forma legible para expresar relaciones de orden.
 
 ## 3. Convenciones de comparación
 
@@ -33,7 +33,7 @@ Dos códigos de clasificación se comparan, en este orden, por:
 4. presencia de Cutter;
 5. parte alfabética del Cutter;
 6. cifras del Cutter;
-7. presencia y contenido de la marca de obra.
+7. presencia y contenido de la edición.
 
 La comparación termina en el primer componente que determina una diferencia.
 
@@ -112,18 +112,18 @@ E43 < E434
 K19 < K199
 ```
 
-La marca de obra del primer código no se compara hasta haber resuelto por completo el Cutter. Por ello:
+La edición del primer código no se compara hasta haber resuelto por completo el Cutter. Por ello:
 
 ```text
 E43c < E434h
 K19m < K199p
 ```
 
-## 8. Marca de obra
+## 8. Edición
 
-La marca de obra se compara únicamente cuando prefijo, DDC y Cutter son equivalentes.
+La edición se compara únicamente cuando prefijo, DDC y Cutter son equivalentes.
 
-Se compara **por segmentos**, de izquierda a derecha, utilizando la lista `marca` recibida de normalización. Cada segmento se compara con el de la misma posición del otro código. El contrato de entrada garantiza que esos segmentos son de la misma clase.
+Se compara **por segmentos**, de izquierda a derecha, utilizando la lista `edicion` recibida de normalización. Cada segmento se compara con el de la misma posición del otro código. El contrato de entrada garantiza que esos segmentos son de la misma clase.
 
 **Segmentos de letras.** Se comparan alfabéticamente, carácter por carácter y sin distinguir mayúsculas de minúsculas:
 
@@ -141,9 +141,9 @@ R829i3 < R829i18
 H477a11 < H477a12
 ```
 
-Es la diferencia con las cifras del Cutter, que se leen como fracción decimal. La cifra de la marca de obra representa el número de edición, y una edición es una cantidad: la 6.ª precede a la 10.ª. El criterio sigue la práctica de LC y OCLC para ordinales en signaturas.
+Es la diferencia con las cifras del Cutter, que se leen como fracción decimal. La cifra de la edición representa su número, que es una cantidad: la 6.ª precede a la 10.ª. El criterio sigue la práctica de LC y OCLC para ordinales en signaturas.
 
-**Longitud.** Si la secuencia completa de segmentos de una marca de obra es prefijo de la de otra, la más corta se ordena primero:
+**Longitud.** Si la secuencia completa de segmentos de una edición es prefijo de la de otra, la más corta se ordena primero:
 
 ```text
 H477a < H477a11
@@ -163,21 +163,21 @@ Dos estructuras son equivalentes para el orden si ningún componente establece u
 | `658 < 658.001` | Orden notacional del número DDC |
 | `658 < 658 H477` | Ausencia de Cutter antes que presencia |
 | `341.485 2 I-97c = 341.4852 I97c` | Misma estructura tras normalización |
-| `C112c < C112-l` | Segmentos de letras de la marca tras normalización |
+| `C112c < C112-l` | Segmentos de letras de la edición tras normalización |
 | `A238 < B415` | Parte alfabética del Cutter |
 | `S248 < S25` | Cifras del Cutter como fracción decimal |
-| `E43c < E434h` | Cifras del Cutter comparadas antes que la marca de obra |
-| `K19m < K199p` | Cifras del Cutter comparadas antes que la marca de obra |
-| `H477a11 < H477a12` | Contenido de la marca de obra |
-| `S492fs7 = S492Fs7` | Marca de obra sin distinguir mayúsculas |
-| `Ch456q6 < Ch456q10 < Ch456q11` | Cifras de la marca de obra por valor numérico |
-| `R829i3 < R829i18` | Cifras de la marca de obra por valor numérico |
+| `E43c < E434h` | Cifras del Cutter comparadas antes que la edición |
+| `K19m < K199p` | Cifras del Cutter comparadas antes que la edición |
+| `H477a11 < H477a12` | Contenido de la edición |
+| `S492fs7 = S492Fs7` | Edición sin distinguir mayúsculas |
+| `Ch456q6 < Ch456q10 < Ch456q11` | Cifras de la edición por valor numérico |
+| `R829i3 < R829i18` | Cifras de la edición por valor numérico |
 | `K87m14 < K87ma11` | Segmento de letras más corto antes que el más largo |
-| `H477a < H477a11` | Marca de obra más corta como prefijo de otra |
+| `H477a < H477a11` | Edición más corta como prefijo de otra |
 | `999 ... < A863 ...` | Ausencia de prefijo antes que presencia |
 | `C863 ... < Ch863 ...` | Prefijo más corto antes que el más largo |
 | `A863 ... < C863 ... < Ch863 ... < CR863 ... < Cu863 ...` | Comparación alfabética de prefijos |
 | `cr863 ... = CR863 ...` | Comparación de prefijos sin distinguir mayúsculas |
 | `001.4 B268-i-2 = 001.4 B268i2` | Misma estructura tras normalización |
 | `530 O-66f = 530 O66f` | Misma estructura tras normalización |
-| `540 S925p2 < 540 S-925t3` | Segmentos de letras de la marca tras normalización |
+| `540 S925p2 < 540 S-925t3` | Segmentos de letras de la edición tras normalización |
