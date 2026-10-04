@@ -76,6 +76,8 @@ describe("formas de escritura del inventario de estantes", () => {
     ["Cr8615E779a^2021", 'Cr / 861.5 / E / 779 / ["a","2021"]'],
     // Ñ.
     ["6584038Ñ372m^13", '— / 658.4038 / Ñ / 372 / ["m","13"]'],
+    // Guion suelto.
+    ["972.86 I584 -", "— / 972.86 / I / 584 / []"],
     // Siguen siendo inválidos.
     ["004.0195-236-i^2", "inválido"], // guion entre dígitos: falta la letra del Cutter
     ["664.815-211p", "inválido"],

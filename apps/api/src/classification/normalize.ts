@@ -61,7 +61,8 @@ function normalize(raw: string): ClassificationCode {
   if (/\d-+\d/.test(text)) {
     throw new InvalidCode("Guion entre dígitos: falta la parte alfabética del Cutter");
   }
-  text = text.replace(/-/g, "");
+  // Un guion suelto no debe dejar un bloque vacío.
+  text = text.replace(/-/g, "").trim().replace(/ +/g, " ");
 
   // §4.3 Superíndices.
   text = replaceSuperscripts(text);
