@@ -4,8 +4,15 @@ Proyecto en español (documentación, comentarios y mensajes de commit). API en 
 
 ## Forma de trabajo
 
-- El usuario revisa el trabajo por partes: implementar en pasos pequeños y esperar su revisión antes de continuar.
-- No hacer commits sin que lo pida.
+- Trabajar en una rama por tema (p. ej. `auth-base`, `parser-normalization`), nunca directamente en `main`.
+- Dentro de la rama de trabajo se permiten commits pequeños, uno por paso lógico, para que el usuario revise el historial por partes.
+- No hacer `push`, ni mergear a `main`, sin que el usuario lo pida.
+- Si el usuario deja una tarea larga, hacer las preguntas al principio y luego avanzar sin esperar revisión entre pasos.
+
+## Documentos de referencia
+
+- `docs/normalization.md` y `docs/classification-ordering.md` son el contrato del parser de códigos (`apps/api/src/classification`). Si cambia una regla, se actualizan el documento, la implementación y sus pruebas en el mismo cambio.
+- Pruebas de la API: `npm test` dentro de `apps/api`.
 
 ## Objetivos de aprendizaje del usuario
 
