@@ -1,6 +1,6 @@
 # Ordenamiento de códigos de clasificación bibliográficos
 
-**Versión 1.0.0**
+**Versión 1.1.0**
 
 ## 1. Propósito y alcance
 
@@ -22,6 +22,14 @@ Utiliza `prefijo`, `ddc`, `cutter_letras`, `cutter_cifras` y `edicion`. El Cutte
 El código completo no se compara como una cadena ASCII. Cada componente se compara con su propio criterio y se respeta la precedencia de la sección 4.
 
 Las comparaciones alfabéticas se realizan carácter por carácter y sin distinguir mayúsculas de minúsculas. `Ch` y `Ll` no reciben tratamiento especial. Si una secuencia de letras es prefijo de otra, la más corta se ordena primero.
+
+El orden de las letras es el del alfabeto español: la `Ñ` va entre la `N` y la `O`. Las vocales con tilde o diéresis se comparan como su vocal base:
+
+```text
+N372 < Ñ372 < O372
+Nz1 < Ñ1
+Á1 = A1
+```
 
 ## 4. Precedencia de comparación
 
@@ -181,3 +189,20 @@ Dos estructuras son equivalentes para el orden si ningún componente establece u
 | `001.4 B268-i-2 = 001.4 B268i2` | Misma estructura tras normalización |
 | `530 O-66f = 530 O66f` | Misma estructura tras normalización |
 | `540 S925p2 < 540 S-925t3` | Segmentos de letras de la edición tras normalización |
+| `N372 < Ñ372 < O372` | `Ñ` entre `N` y `O` |
+| `Á1 = A1` | Vocales con tilde como su vocal base |
+| `97286O13c = 972.86 O13c` | Misma estructura tras normalización (DDC sin punto) |
+| `001.42H557m^4 = 001.42 H557m4` | Misma estructura tras normalización (superíndice) |
+
+Estos casos se verifican en `apps/api/src/classification/compare.test.ts`, tanto con la comparación directa como con la clave binaria de [`sort-key.md`](sort-key.md).
+
+## 11. Implementación en la base de datos
+
+La base de datos no aplica estas reglas componente por componente. Cada código válido se convierte en una clave binaria (`BYTEA`) cuyo orden byte a byte coincide con el de este documento; su formato se define en [`sort-key.md`](sort-key.md).
+
+## 12. Cambios
+
+**1.1.0**
+
+- Se define el orden de la `Ñ` y de las vocales con tilde o diéresis (3).
+- La regla del prefijo (5) se contrastó con el inventario de estantes y no cambia: los 1 595 rangos ubican todos los códigos con prefijo después del último código sin prefijo (`999M151t < A861B664t`), agrupados por prefijo.

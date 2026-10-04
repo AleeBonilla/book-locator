@@ -3,7 +3,7 @@
 // expresiones regulares: `[${LETTER}]`.
 export const LETTER = "A-Za-zÑñÁÉÍÓÚÜáéíóúü";
 
-// Rango de cada letra al comparar (normalization.md §4.6 y
+// Rango de cada letra al comparar (normalization.md §2 y
 // classification-ordering.md §3): sin distinguir mayúsculas, las vocales con
 // tilde valen como su vocal base y la Ñ va entre la N y la O. Los rangos
 // empiezan en 1 para que el 0 quede libre como «fin de secuencia».

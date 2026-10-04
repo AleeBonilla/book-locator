@@ -74,7 +74,7 @@ function normalize(raw: string): ClassificationCode {
     }
   }
 
-  // §4.6 División en componentes: el primer bloque empieza con el prefijo y
+  // §4.5 División en componentes: el primer bloque empieza con el prefijo y
   // el DDC; lo que sigue al DDC, en ese bloque o en los siguientes, es el
   // Cutter con su edición.
   const head = HEAD.exec(blocks[0]);
@@ -122,7 +122,7 @@ function replaceSuperscripts(text: string): string {
   return result;
 }
 
-// §4.5 Normalización del número DDC.
+// §4.6 Normalización del número DDC.
 function normalizeDdc(text: string): string {
   let ddc = text.replace(/,/g, ".");
   const firstDot = ddc.indexOf(".");
@@ -139,7 +139,7 @@ function normalizeDdc(text: string): string {
   return ddc;
 }
 
-// §4.4 (edición separada) y §4.6: reúne el texto del Cutter y la edición a
+// §4.4 (edición separada) y §4.5: reúne el texto del Cutter y la edición a
 // partir de lo que siguió al DDC en el primer bloque y de los bloques
 // restantes. Solo se admite una edición de letras separada de un Cutter
 // completo; cualquier otro bloque adicional invalida la entrada.

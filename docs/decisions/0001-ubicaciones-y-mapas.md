@@ -27,7 +27,7 @@ Decisiones que modifican el esquema inicial de `main` para representar estructur
 - Se devuelven todas las que contienen el código. Los rangos pueden solaparse, así que pueden ser varias (normalmente dos anaqueles contiguos), y se marcan todas.
 - Si ninguna lo contiene porque el código cae en un hueco, se devuelven las dos vecinas: la que termina justo antes del código y la que empieza justo después. Con Anaquel 1 en `000–099` y Anaquel 2 en `150–199`, una búsqueda de `120` devuelve ambos anaqueles, no el mueble que los contiene. Si el código queda antes del primer rango o después del último, se devuelve solo esa vecina.
 - Un padre puede recibir rango directamente, sin que sus hijos lo tengan. Cuando todos sus hijos tienen rango, el padre recibe el inicio del primero y el fin del último, según `sort_order`.
-- No se almacena el JSON normalizado: el backend lo reproduce desde `range_*_raw` con las reglas de [`normalization.md`](../normalization.md). Se conservan `range_*_key` para la búsqueda; si cambian las reglas, se recalculan desde `raw`.
+- No se almacena el JSON normalizado: el backend lo reproduce desde `range_*_raw` con las reglas de [`normalization.md`](../normalization.md). Se conservan `range_*_key` para la búsqueda (formato en [`sort-key.md`](../sort-key.md)); si cambian las reglas, se recalculan desde `raw`.
 
 ## 3. `sort_order` como posición entre hermanos
 
