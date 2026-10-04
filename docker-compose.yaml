@@ -1,0 +1,33 @@
+services:
+  postgres:
+    # PostgreSQL 16 en una imagen pequeña basada en Alpine.
+    image: postgres:16-alpine
+    container_name: bjff-postgres
+    restart: unless-stopped
+
+    # Estos valores se usan únicamente al crear la base por primera vez.
+    environment:
+      POSTGRES_DB: bjff_book_locator
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: bjff
+
+    # Permite conectarte desde tu máquina en localhost:5432.
+    ports:
+      - "5432:5432"
+
+    volumes:
+      # Conserva los datos aunque se elimine el contenedor.
+      - postgres_data:/var/lib/postgresql/data
+      # Ejecuta este esquema SQL al inicializar una base de datos vacía.
+      - ./database/001-initial-schema.sql:/docker-entrypoint-initdb.d/001-initial-schema.sql:ro
+
+    healthcheck:
+      # Docker ejecuta este comando para comprobar que PostgreSQL acepta conexiones.
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bjff_book_locator"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+# Volumen gestionado por Docker; se llama postgres_data dentro de este proyecto.
+volumes:
+  postgres_data:
