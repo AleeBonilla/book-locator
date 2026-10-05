@@ -240,3 +240,69 @@ export async function renumberLocations(
     [schemeId, move?.locationId ?? null, move?.parentId ?? null, move?.position ?? null],
   );
 }
+
+export interface StoredRange {
+  start_raw: string;
+  end_raw: string;
+  start_key: Buffer;
+  end_key: Buffer;
+}
+
+export interface ChildRange {
+  location_id: number;
+  range: StoredRange | null;
+}
+
+// Hijos de una ubicación, en orden, con sus rangos y claves. Se usa para
+// calcular el rango del padre a partir de los hijos (decisión 0005).
+export async function childRanges(db: Queryable, parentId: number): Promise<ChildRange[]> {
+  const { rows } = await db.query<{
+    location_id: number;
+    range_start_raw: string | null;
+    range_end_raw: string | null;
+    range_start_key: Buffer | null;
+    range_end_key: Buffer | null;
+  }>(
+    `SELECT location_id, range_start_raw, range_end_raw, range_start_key, range_end_key
+       FROM locations
+      WHERE parent_location_id = $1
+      ORDER BY sort_order`,
+    [parentId],
+  );
+  return rows.map((row) => ({
+    location_id: row.location_id,
+    range:
+      row.range_start_raw === null
+        ? null
+        : {
+            start_raw: row.range_start_raw,
+            end_raw: row.range_end_raw!,
+            start_key: row.range_start_key!,
+            end_key: row.range_end_key!,
+          },
+  }));
+}
+
+// Guarda el rango de una ubicación, o lo elimina con `range` null. Los cuatro
+// campos cambian juntos (restricción locations_range_complete).
+export async function setRange(
+  db: Queryable,
+  locationId: number,
+  range: StoredRange | null,
+  userId: number,
+): Promise<void> {
+  await db.query(
+    `UPDATE locations
+        SET range_start_raw = $2, range_end_raw = $3, range_start_key = $4, range_end_key = $5,
+            updated_by = $6, updated_at = now()
+      WHERE location_id = $1`,
+    [
+      locationId,
+      range?.start_raw ?? null,
+      range?.end_raw ?? null,
+      range?.start_key ?? null,
+      range?.end_key ?? null,
+      userId,
+    ],
+  );
+}

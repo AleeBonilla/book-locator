@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { idParam, parse } from "../http/validate.js";
+import { clearLocationRange, setLocationRange } from "./ranges.js";
 import * as service from "./service.js";
 
 // En el cuerpo JSON los identificadores ya llegan como números.
@@ -33,6 +34,12 @@ const moveLocationBody = z.object({
   position: positionField.optional(),
 });
 
+// Texto del código tal como se escribe en el catálogo: se guarda sin cambios
+// y lo valida el normalizador (normalization.md), no Zod.
+const rawCode = z.string().min(1).max(120);
+
+const rangeBody = z.object({ start: rawCode, end: rawCode });
+
 // Todas las rutas requieren sesión: se monta con requireAuth en app.ts.
 export const locationsRouter = Router();
 
@@ -50,4 +57,15 @@ locationsRouter.post("/:locationId/move", async (req, res) => {
 locationsRouter.delete("/:locationId", async (req, res) => {
   await service.deleteLocation(parse(idParam, req.params.locationId));
   res.status(204).end();
+});
+
+// Asigna el rango { start, end } (ambos extremos incluidos). Responde 422 con
+// el motivo si algún código es inválido o si el inicio va después del fin.
+locationsRouter.put("/:locationId/range", async (req, res) => {
+  const id = parse(idParam, req.params.locationId);
+  res.json(await setLocationRange(id, parse(rangeBody, req.body), req.userId!));
+});
+
+locationsRouter.delete("/:locationId/range", async (req, res) => {
+  res.json(await clearLocationRange(parse(idParam, req.params.locationId), req.userId!));
 });

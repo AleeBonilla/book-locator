@@ -142,7 +142,7 @@ export function setRangeRequiredByLevel(
   });
 }
 
-async function mustFind(db: Queryable, locationId: number): Promise<LocationRow> {
+export async function mustFind(db: Queryable, locationId: number): Promise<LocationRow> {
   const location = await queries.findLocation(db, locationId);
   if (!location) throw new NotFoundError(`No existe la ubicación ${locationId}`);
   return location;
