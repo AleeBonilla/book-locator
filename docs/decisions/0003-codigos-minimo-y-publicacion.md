@@ -93,7 +93,7 @@ El código jerárquico permite, además, resaltar grupos completos por prefijo (
 
 ## 5. Qué garantiza la base de datos
 
-La migración [`003-location-codes-and-publication.sql`](../../database/003-location-codes-and-publication.sql) agrega estas restricciones; el resto de las reglas de esta decisión las aplica el backend.
+Las migraciones [`003-location-codes-and-publication.sql`](../../database/003-location-codes-and-publication.sql) y [`004-location-code-hierarchy.sql`](../../database/004-location-code-hierarchy.sql) agregan estas restricciones; el resto de las reglas de esta decisión las aplica el backend.
 
 | Regla | Restricción |
 |---|---|
@@ -102,8 +102,9 @@ La migración [`003-location-codes-and-publication.sql`](../../database/003-loca
 | Formato del código: enteros positivos sin ceros a la izquierda, separados por guiones | `locations_code_format` |
 | Un segmento por nivel y el último igual a `sort_order` | `locations_code_matches_position` |
 | Códigos únicos, con comprobación diferible para reordenar subárboles | `locations_scheme_code_unique` (`DEFERRABLE`) |
+| El código es el del padre + `-` + `sort_order`, comprobado al hacer `COMMIT` | trigger `locations_code_hierarchy` (004) |
 | No se publica sin plano | `schemes_published_has_map` |
 | Solo se activa un esquema publicado; el activo no se puede despublicar | `schemes_active_valid` |
 | A lo sumo un esquema activo | índice único parcial `schemes_single_active` |
 
-Quedan en el backend: que el código coincida con el del padre, la cobertura de las marcas, el cálculo del estado, el congelamiento del esquema publicado y la validación del plano.
+Quedan en el backend: generar los códigos, la cobertura de las marcas, el cálculo del estado, el congelamiento del esquema publicado y la validación del plano.
