@@ -90,3 +90,20 @@ El código jerárquico permite, además, resaltar grupos completos por prefijo (
 - **Despublicar.** Elimina `published_by` y `published_at` y vuelve a permitir cambios. No se puede despublicar el esquema activo: primero hay que activar otro, para que la búsqueda pública nunca se quede sin esquema.
 - **Activar.** Solo se puede activar un esquema publicado. La base de datos ya exige `ASSIGNED` para activar (`schemes_active_valid`); el backend exige además la publicación.
 - **Copiar (recomendado para cambios).** Crea un esquema nuevo, sin publicar ni activar, con la misma estructura, códigos, marcas, rangos y plano. Se trabaja sobre la copia, se publica y se activa; la activación desactiva al anterior en la misma transacción. El esquema anterior queda publicado como historial.
+
+## 5. Qué garantiza la base de datos
+
+La migración [`003-location-codes-and-publication.sql`](../../database/003-location-codes-and-publication.sql) agrega estas restricciones; el resto de las reglas de esta decisión las aplica el backend.
+
+| Regla | Restricción |
+|---|---|
+| Marca del mínimo de asignación | columna `locations.range_required` |
+| Solo las raíces están en el nivel 1 | `locations_root_level` |
+| Formato del código: enteros positivos sin ceros a la izquierda, separados por guiones | `locations_code_format` |
+| Un segmento por nivel y el último igual a `sort_order` | `locations_code_matches_position` |
+| Códigos únicos, con comprobación diferible para reordenar subárboles | `locations_scheme_code_unique` (`DEFERRABLE`) |
+| No se publica sin plano | `schemes_published_has_map` |
+| Solo se activa un esquema publicado; el activo no se puede despublicar | `schemes_active_valid` |
+| A lo sumo un esquema activo | índice único parcial `schemes_single_active` |
+
+Quedan en el backend: que el código coincida con el del padre, la cobertura de las marcas, el cálculo del estado, el congelamiento del esquema publicado y la validación del plano.

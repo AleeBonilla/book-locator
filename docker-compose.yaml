@@ -21,6 +21,7 @@ services:
       # Ejecuta estos esquemas SQL (en orden alfabético) al inicializar una base de datos vacía.
       - ./database/001-initial-schema.sql:/docker-entrypoint-initdb.d/001-initial-schema.sql:ro
       - ./database/002-sessions.sql:/docker-entrypoint-initdb.d/002-sessions.sql:ro
+      - ./database/003-location-codes-and-publication.sql:/docker-entrypoint-initdb.d/003-location-codes-and-publication.sql:ro
 
     healthcheck:
       # Docker ejecuta este comando para comprobar que PostgreSQL acepta conexiones.
