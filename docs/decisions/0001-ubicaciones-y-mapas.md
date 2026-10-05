@@ -2,6 +2,7 @@
 
 - **Estado:** Aceptadas para el esquema actual
 - **Fecha:** 2026-10-02
+- **Modificada por:** [0003](0003-codigos-minimo-y-publicacion.md) (§4: `code` autogenerado y esquema publicado congelado; §5: etiquetado del plano y reglas de validación)
 
 Decisiones que modifican el esquema inicial de `main` para representar estructuras físicas irregulares (secciones con distinto número de caras, ramas que terminan en mueble o en anaquel) con la menor complejidad posible.
 
@@ -39,11 +40,15 @@ Los rangos siguen el orden físico del árbol y se guardan en la ubicación, no 
 
 Por eso, mientras alguna ubicación del esquema tenga rango, no se permite crear ni eliminar ubicaciones ni cambiar `parent_location_id`, `level`, `sort_order` o `code` (este último lo usa el SVG). Sí se pueden editar `name`, `level_name` y `level_name_override`, porque solo cambian cómo se muestra la ubicación. Al quitar todos los rangos, el árbol vuelve a ser editable. El backend aplica esta regla.
 
+> **Actualización (0003):** `code` ya no se edita; el backend lo genera a partir de `sort_order` y lo recalcula cuando cambia la estructura. Un esquema publicado no admite ningún cambio hasta que se despublique.
+
 ## 5. Un solo plano superior
 
 Cada esquema tiene un único plano en vista superior, guardado como SVG en `schemes.map_svg` (`TEXT`, para que no cambie por fuera del ciclo de publicación; admite `NULL` en borrador). Se eliminan la vista frontal, las capas, el *drilldown* y las variantes de SVG.
 
 Cada figura del SVG lleva como identificador el `code` de su ubicación; se resaltan los resultados y sus ancestros que tengan figura. Toda ubicación con figura en el SVG debe tener su rango completo (inicio y fin); el backend lo valida antes de publicar. No se guarda qué niveles representa el plano, porque en ramas irregulares un mismo nivel no es el mismo tipo de estructura (el mueble es nivel 2 en Sección > Mueble y nivel 3 en Sección > Cara > Mueble). Lo que queda por debajo de la última figura se describe con texto: “Cara Norte, tercer anaquel de arriba hacia abajo”.
+
+> **Actualización (0003):** las figuras se identifican con `id="loc-<code>"`. Ya no se exige que una ubicación con figura tenga rango propio; se exige que cada etiqueta corresponda a una ubicación existente. Cuando el resultado de una búsqueda está por encima de las figuras, se resaltan todas sus figuras descendientes.
 
 ## 6. Sin dependencia de `ordering_profiles`
 
