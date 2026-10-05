@@ -153,7 +153,7 @@ describe("la app real", () => {
   });
 
   it("responde 404 en JSON a una ruta inexistente", async () => {
-    const response = await fetch(`${baseUrl}/schemes/no-existe`);
+    const response = await fetch(`${baseUrl}/no-existe`);
     assert.equal(response.status, 404);
     assert.deepEqual(await response.json(), { error: "Ruta no encontrada" });
   });

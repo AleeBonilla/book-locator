@@ -2,7 +2,10 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { checkDatabase } from "./db.js";
 import { authRouter } from "./auth/routes.js";
+import { requireAuth } from "./auth/middleware.js";
 import { errorHandler, notFoundHandler } from "./http/error-handler.js";
+import { locationsRouter } from "./locations/routes.js";
+import { schemesRouter } from "./schemes/routes.js";
 
 // Arma la aplicación sin ponerla a escuchar, para que las pruebas puedan
 // levantarla en un puerto libre.
@@ -14,6 +17,10 @@ export function createApp(): express.Express {
   app.use(cookieParser()); // convierte la cabecera Cookie en req.cookies
 
   app.use("/auth", authRouter);
+
+  // Administración: requireAuth corre antes que cualquier ruta de estos routers.
+  app.use("/schemes", requireAuth, schemesRouter);
+  app.use("/locations", requireAuth, locationsRouter);
 
   app.get("/", (_req, res) => {
     res.send("API funcionando");
