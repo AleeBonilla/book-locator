@@ -7,7 +7,7 @@ Proyecto en español (documentación, comentarios y mensajes de commit). API en 
 - Cada implementación independiente va en su propia rama (p. ej. `auth-base`, `parser-normalization`, `db-location-code-trigger`); no se mezclan trabajos no relacionados en una misma rama ni se trabaja directamente en `main`.
 - Dentro de la rama se permiten commits pequeños, uno por paso lógico, para que el usuario revise el historial por partes.
 - Cada rama termina mergeándose a `main` cuando su trabajo está completo y probado.
-- No hacer `push` sin que el usuario lo pida.
+- Después de mergear una rama a `main`, hacer `push` de `main` y de esa rama a `origin`.
 - Las migraciones ya aplicadas (`database/NNN-*.sql`) no se editan: los cambios van en una migración nueva, que también se agrega a `docker-compose.yaml`.
 - Si el usuario deja una tarea larga, hacer las preguntas al principio y luego avanzar sin esperar revisión entre pasos.
 
