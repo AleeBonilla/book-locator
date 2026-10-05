@@ -44,6 +44,8 @@ Un esquema no incluye el plano en las respuestas, solo `has_map`. El `status` lo
 | `PATCH /locations/:locationId` | `{ name?, level_name?, level_name_override?, range_required? }` | La ubicación modificada. |
 | `POST /locations/:locationId/move` | `{ parent_location_id, position? }` | La ubicación en su nuevo lugar. `parent_location_id: null` la convierte en raíz. |
 | `DELETE /locations/:locationId` | — | **204**. Elimina también todo su subárbol. |
+| `PUT /locations/:locationId/range` | `{ start, end }` | La ubicación con su `range`. Ambos extremos incluidos. |
+| `DELETE /locations/:locationId/range` | — | La ubicación sin rango. |
 
 Una ubicación en la respuesta:
 
@@ -77,3 +79,17 @@ Una ubicación en la respuesta:
 | Datos con forma incorrecta (campos vacíos, tipos) | **400** |
 
 Con rangos asignados se siguen pudiendo editar nombres y marcas del mínimo.
+
+### Rangos
+
+Reglas completas en la [decisión 0005](decisions/0005-rangos-de-ubicaciones.md).
+
+| Situación | Respuesta |
+|---|---|
+| Algún extremo no es un código válido según [`normalization.md`](normalization.md) | **422**, con el motivo de cada extremo en `details` (`path`: `start` o `end`) |
+| El inicio va después del fin según las [reglas de ordenamiento](classification-ordering.md) | **422** |
+| El rango de la ubicación se calcula de sus hijos (todos tienen rango) | **409**: hay que cambiar el de algún hijo |
+| El rango calculado de un ancestro quedaría invertido | **422**, sin guardar nada |
+| El esquema está publicado | **409** |
+
+Al asignar o borrar un rango, se actualizan los rangos calculados de los ancestros y el `status` del esquema.
