@@ -1,5 +1,6 @@
 import { Router } from "express";
 import type { CookieOptions } from "express";
+import { z } from "zod";
 import { pool } from "../db.js";
 import { hashPassword, verifyPassword } from "./password.js";
 import { requireAuth } from "./middleware.js";
@@ -24,15 +25,25 @@ const dummyHash = hashPassword("contraseña-que-no-pertenece-a-nadie");
 
 type UserRow = { user_id: number; password_hash: string; enabled: boolean };
 
+// Forma que debe tener el cuerpo de POST /auth/login. Zod comprueba los datos
+// en tiempo de ejecución y, a la vez, TypeScript deduce de aquí el tipo de
+// parsed.data ({ identifier: string; password: string }).
+const loginBody = z.object({
+  identifier: z.string().min(1),
+  password: z.string().min(1),
+});
+
 export const authRouter = Router();
 
 authRouter.post("/login", async (req, res) => {
-  const { identifier, password } = req.body ?? {};
+  const parsed = loginBody.safeParse(req.body);
 
-  if (typeof identifier !== "string" || typeof password !== "string" || !identifier || !password) {
+  // Respuesta genérica a propósito: en el login no se detalla qué campo falló.
+  if (!parsed.success) {
     res.status(400).json({ error: "Se requieren identifier y password" });
     return;
   }
+  const { identifier, password } = parsed.data;
 
   const { rows } = await pool.query<UserRow>(
     `SELECT user_id, password_hash, enabled
