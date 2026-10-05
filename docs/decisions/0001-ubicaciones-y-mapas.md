@@ -48,7 +48,7 @@ Cada esquema tiene un único plano en vista superior, guardado como SVG en `sche
 
 Cada figura del SVG lleva como identificador el `code` de su ubicación; se resaltan los resultados y sus ancestros que tengan figura. Toda ubicación con figura en el SVG debe tener su rango completo (inicio y fin); el backend lo valida antes de publicar. No se guarda qué niveles representa el plano, porque en ramas irregulares un mismo nivel no es el mismo tipo de estructura (el mueble es nivel 2 en Sección > Mueble y nivel 3 en Sección > Cara > Mueble). Lo que queda por debajo de la última figura se describe con texto: “Cara Norte, tercer anaquel de arriba hacia abajo”.
 
-> **Actualización (0003):** las figuras se identifican con `id="loc-<code>"`. Ya no se exige que una ubicación con figura tenga rango propio; se exige que cada etiqueta corresponda a una ubicación existente. Cuando el resultado de una búsqueda está por encima de las figuras, se resaltan todas sus figuras descendientes.
+> **Actualización (0003):** las figuras se identifican con `id="loc-<code>"`. Ya no se exige que una ubicación con figura tenga rango propio; se exige que cada etiqueta corresponda a una ubicación existente y que toda ubicación del mínimo de asignación tenga su figura.
 
 ## 6. Sin dependencia de `ordering_profiles`
 

@@ -4,7 +4,7 @@ Esta guía es para quien dibuja el plano de la biblioteca que verá el público 
 
 ## 1. Qué es el plano y para qué se usa
 
-Cuando alguien busca un libro, la aplicación muestra el plano y resalta dónde está: el mueble, o la cara o la fila completa si el libro no se puede ubicar con más precisión. Para eso, cada estructura dibujada tiene que llevar una **etiqueta** con el código que le asignó la aplicación.
+Cuando alguien busca un libro, la aplicación muestra el plano y resalta dónde está, normalmente el mueble. Para eso, cada estructura dibujada tiene que llevar una **etiqueta** con el código que le asignó la aplicación.
 
 La aplicación organiza la biblioteca así:
 
@@ -12,7 +12,7 @@ La aplicación organiza la biblioteca así:
 Fila › Cara › Mueble › Anaquel
 ```
 
-No hace falta dibujar todos los niveles. Lo habitual es dibujar los **muebles**; los anaqueles no se dibujan y se describen con texto («tercer anaquel de arriba hacia abajo»).
+La aplicación define qué estructuras son **obligatorias** en el plano: las que forman el mínimo de asignación, habitualmente los muebles. **Todas las obligatorias deben estar dibujadas y etiquetadas**, sin excepción; si falta una, el plano no se puede publicar. Podés dibujar además otras estructuras (una cara o una fila completas, por ejemplo), pero no es necesario. Lo que está por debajo de lo dibujado, como los anaqueles, se describe con texto («tercer anaquel de arriba hacia abajo»).
 
 ## 2. Cualquier herramienta sirve
 
@@ -28,18 +28,18 @@ Si tu herramienta no aparece en la sección 6, comprobalo así: exportá un arch
 1. **Pedí la hoja de códigos.** La estructura (filas, caras, muebles…) se crea primero en la aplicación, y la aplicación asigna un código a cada ubicación. La hoja lista el código, el nombre y la ruta de cada una:
 
    ```text
-   6-1-10    Mueble 10    Fila 6 › Cara 1 › Mueble 10
+   6-1-10    Mueble 10    Fila 6 › Cara 1 › Mueble 10    obligatoria
    ```
 
-   No inventes códigos ni los calcules por tu cuenta: usá siempre los de la hoja.
+   La última columna indica si la estructura es obligatoria en el plano. No inventes códigos ni los calcules por tu cuenta: usá siempre los de la hoja.
 
-2. **Dibujá el plano.** Podés usar una imagen o un render de fondo y dibujar encima una figura por cada estructura que quieras que se pueda resaltar (sección 4).
+2. **Dibujá el plano.** Podés usar una imagen o un render de fondo y dibujar encima una figura por cada estructura obligatoria, y por las demás que quieras que se puedan resaltar (sección 4).
 
 3. **Etiquetá cada figura** con el nombre `loc-` seguido de su código (sección 5).
 
 4. **Exportá a SVG** (sección 6).
 
-5. **Subí el archivo a la aplicación.** Te responde con un reporte: etiquetas con códigos que no existen, etiquetas mal escritas, zonas sin dibujar o contenido no permitido. Corregí y volvé a subir hasta que no haya errores.
+5. **Subí el archivo a la aplicación.** Te responde con un reporte: etiquetas con códigos que no existen, etiquetas mal escritas, estructuras obligatorias sin dibujar o contenido no permitido. Corregí y volvé a subir hasta que no haya errores.
 
 Si después de recibir la hoja alguien cambia la estructura en la aplicación (agrega, quita o reordena muebles), **los códigos pueden cambiar**. Pedí una hoja nueva y revisá las etiquetas.
 
@@ -86,7 +86,7 @@ Reglas:
 - **Todo en minúsculas**, sin espacios, sin puntos y sin nada después del código.
 - **Cada código, una sola vez.** Si duplicás un objeto ya etiquetado, la copia hereda el nombre y la herramienta le agrega algo (`loc-6-1-10 2`, `loc-6-1-10_2`). Renombrala antes de exportar; la aplicación rechaza las etiquetas así.
 - Los objetos sin etiqueta (fondos, paredes, textos) pueden llamarse como quieras, mientras no empiecen con `loc-`.
-- No hace falta etiquetar todo. Lo que no esté dibujado se describe con texto, y la aplicación avisa qué zonas quedaron sin figura.
+- Toda estructura marcada como obligatoria en la hoja debe tener su figura con su propia etiqueta. No alcanza con dibujar sus partes (los anaqueles de un mueble) ni la estructura que la contiene (la cara).
 
 ## 6. Exportar desde cada herramienta
 
@@ -117,7 +117,7 @@ Reglas:
 |---|---|---|
 | Código inexistente: `loc-6-1-17` | No hay ninguna ubicación con ese código | Revisá la hoja; puede ser un error de tipeo o una hoja vieja |
 | Etiqueta mal formada: `loc-6-1-10 2` | El nombre tiene algo más que `loc-` y el código | Renombrá el objeto; suele ser una copia de otro |
-| Zona sin dibujar: Fila 4 › Cara 2 | Esa parte de la estructura no tiene ninguna figura | Es una advertencia: se puede publicar, pero esa zona solo se indicará con texto |
+| Falta una estructura obligatoria: `loc-4-2-7` (Fila 4 › Cara 2 › Mueble 7) | Esa estructura no tiene figura con su etiqueta | Dibujala y etiquetala; sin ella el plano no se puede publicar |
 | Contenido no permitido | El archivo tiene scripts, enlaces externos o HTML incrustado | Exportá de nuevo desde la herramienta, sin complementos |
 | Falta `viewBox` | La herramienta no lo escribió | Volvé a exportar con las opciones de la sección 6 |
 | Archivo demasiado grande | Supera los 5 MB | Reducí o comprimí las imágenes de fondo |

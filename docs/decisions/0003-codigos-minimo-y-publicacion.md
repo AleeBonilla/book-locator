@@ -76,14 +76,13 @@ Esto reemplaza la regla de 0001 §5 según la cual «toda ubicación con figura 
 | Etiqueta `loc-…` mal formada (p. ej. `loc-6-1-10 2`, típica de una capa duplicada) | Error |
 | Dos figuras con la misma etiqueta | Imposible: el `id` es único; la herramienta renombra la segunda y cae en el caso anterior |
 | SVG con contenido no permitido (ver la guía) o sin `viewBox` | Error, el archivo se rechaza al subirlo |
-| Ubicación marcada del mínimo sin ninguna figura en su rama (ni ella, ni un ancestro, ni un descendiente) | Advertencia: se publica, pero esa zona solo se describe con texto |
+| Ubicación marcada del mínimo (`range_required`) sin su figura `loc-<código>` | Error, no se puede publicar |
 
-Una figura no necesita rango propio. Al buscar, si el resultado es la ubicación `L`:
+**Toda ubicación del mínimo debe estar dibujada**, con su propia figura; no basta con que estén dibujados sus hijos o un ancestro. Se pueden dibujar además otras ubicaciones, por encima o por debajo del mínimo. Una figura no necesita rango propio.
 
-1. si `L` tiene figura, se resalta esa figura;
-2. si no, y algún ancestro de `L` tiene figura, se resalta el ancestro más cercano (p. ej. el mueble que contiene un anaquel);
-3. si no, y hay descendientes de `L` con figura, se resaltan todos (`[id^="loc-6-1-"]`, para una cara). El guion final es necesario para que `6-1` no coincida con `6-10`;
-4. si nada de su rama está dibujado, el resultado se describe solo con texto.
+Como un esquema publicado tiene rango en todo el mínimo, el resultado de una búsqueda (la ubicación con rango más profunda, 0001 §2) siempre es una ubicación del mínimo o una que está por debajo. Por eso, para cualquier resultado `L` existe una figura que resaltar: **la de `L` o la de su ancestro más cercano que tenga figura** (p. ej. el mueble que contiene un anaquel). Lo que queda por debajo de esa figura se describe con texto.
+
+El código jerárquico permite, además, resaltar grupos completos por prefijo (`[id^="loc-6-1-"]` para toda una cara; el guion final evita que `6-1` coincida con `6-10`), pero la búsqueda no lo necesita.
 
 ## 4. Publicación, congelamiento y copias
 
