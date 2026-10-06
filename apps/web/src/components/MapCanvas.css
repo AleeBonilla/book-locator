@@ -100,3 +100,59 @@
 .lienzo-boton-texto {
   padding: 0 var(--e4) 0 var(--e3);
 }
+
+/* Flecha que apunta a la figura resaltada. Su punta está en (0, 0) del
+   contenedor, que MapCanvas ubica sobre el borde superior de la figura; el
+   tamaño no cambia con el zoom. Flota suavemente para llamar la atención. */
+.lienzo-flecha {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.lienzo-flecha svg {
+  position: absolute;
+  left: -22px;
+  top: -66px;
+  width: 44px;
+  height: 60px;
+  overflow: visible;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.35));
+  animation: flecha-flota 1.4s ease-in-out infinite;
+}
+
+.lienzo-flecha path {
+  stroke: #fff;
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+.lienzo-flecha-encontrada path {
+  fill: var(--bjff-rojo);
+}
+
+.lienzo-flecha-vecina svg {
+  width: 34px;
+  height: 46px;
+  left: -17px;
+  top: -52px;
+}
+
+.lienzo-flecha-vecina path {
+  fill: var(--tec-turquesa);
+}
+
+@keyframes flecha-flota {
+  0%,
+  100% {
+    transform: translateY(-9px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+}

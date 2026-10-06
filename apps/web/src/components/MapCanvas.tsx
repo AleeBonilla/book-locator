@@ -55,9 +55,39 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
     getInsetsRef.current = getInsets;
   }, [getInsets]);
 
+  // Flechas sobre las figuras resaltadas. Viven fuera del SVG, en una capa
+  // encima, para conservar su tamaño en pantalla con cualquier zoom: aquí se
+  // guarda, por cada una, el punto del SVG al que apunta (borde superior de
+  // la figura, al centro).
+  const arrowTargets = useRef<({ x: number; y: number } | null)[]>([]);
+  const arrowEls = useRef<(HTMLDivElement | null)[]>([]);
+
+  const placeArrows = () => {
+    const el = viewport.current;
+    if (!el) return;
+    const v = view.current;
+    const sx = el.clientWidth / v.w;
+    const sy = el.clientHeight / v.h;
+    // Dos figuras vecinas (p. ej. muebles espalda con espalda) darían dos
+    // flechas encimadas: si quedan a menos de 30 px, se muestra solo una.
+    const shown: { x: number; y: number }[] = [];
+    arrowEls.current.forEach((arrow, index) => {
+      const target = arrowTargets.current[index];
+      if (!arrow) return;
+      const point = target && { x: (target.x - v.x) * sx, y: (target.y - v.y) * sy };
+      const overlapping = point && shown.some((p) => Math.hypot(p.x - point.x, p.y - point.y) < 30);
+      arrow.style.visibility = point && !overlapping ? 'visible' : 'hidden';
+      if (point && !overlapping) {
+        shown.push(point);
+        arrow.style.transform = `translate(${point.x}px, ${point.y}px)`;
+      }
+    });
+  };
+
   const apply = () => {
     const { x, y, w, h } = view.current;
     svgEl.current?.setAttribute('viewBox', `${x} ${y} ${w} ${h}`);
+    placeArrows();
   };
 
   // Ajusta una vista a los límites: no alejarse ni acercarse de más, y que el
@@ -214,6 +244,15 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
       figure.parentNode?.appendChild(figure);
       figure.classList.add(kind === 'found' ? 'figura-encontrada' : 'figura-vecina');
     }
+    // Cada flecha apunta al centro del borde superior de su figura.
+    arrowEls.current.length = highlights.length;
+    arrowTargets.current = highlights.map(({ code }) => {
+      const box = boxOf(root, [root.querySelector<SVGGraphicsElement>(`[id="loc-${CSS.escape(code)}"]`)]);
+      return box ? { x: box.x + box.w / 2, y: box.y } : null;
+    });
+    placeArrows();
+    // placeArrows solo lee referencias; no es una dependencia real.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlights, svg, focusKey]);
 
   useEffect(() => {
@@ -333,6 +372,21 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
       onKeyDown={onKeyDown}
     >
       <div ref={host} className="lienzo-svg" dangerouslySetInnerHTML={{ __html: svg }} />
+
+      {highlights.map((highlight, index) => (
+        <div
+          key={highlight.code}
+          ref={(el) => {
+            arrowEls.current[index] = el;
+          }}
+          className={highlight.kind === 'found' ? 'lienzo-flecha lienzo-flecha-encontrada' : 'lienzo-flecha lienzo-flecha-vecina'}
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 32 44">
+            <path d="M16 41 3 24.5h8.5V3h9v21.5H29Z" />
+          </svg>
+        </div>
+      ))}
 
       <div className="lienzo-controles" role="toolbar" aria-label="Controles del plano">
         {highlights.length > 0 && (
