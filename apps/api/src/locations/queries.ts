@@ -306,3 +306,33 @@ export async function setRange(
     ],
   );
 }
+
+// Copia todas las ubicaciones de un esquema a otro, con sus códigos, marcas
+// y rangos. Cada ubicación recibe un id nuevo y su padre se traduce al id
+// nuevo del padre. Los códigos se conservan: son únicos por esquema, así que
+// el plano copiado sigue sirviendo sin cambios (decisión 0003 §4).
+//
+// Es una sola sentencia: la clave foránea al padre se comprueba al terminar,
+// con todas las filas ya insertadas, y el trigger de códigos al hacer COMMIT.
+export async function copyLocations(db: Queryable, fromSchemeId: number, toSchemeId: number, userId: number): Promise<void> {
+  await db.query(
+    `WITH source AS MATERIALIZED (
+       SELECT l.*, nextval(pg_get_serial_sequence('locations', 'location_id')) AS new_id
+         FROM locations l
+        WHERE l.scheme_id = $1
+     )
+     INSERT INTO locations (
+       location_id, scheme_id, parent_location_id, level, level_name, level_name_override,
+       name, code, sort_order, range_required,
+       range_start_raw, range_end_raw, range_start_key, range_end_key,
+       created_by, updated_by
+     )
+     SELECT s.new_id, $2, parent.new_id, s.level, s.level_name, s.level_name_override,
+            s.name, s.code, s.sort_order, s.range_required,
+            s.range_start_raw, s.range_end_raw, s.range_start_key, s.range_end_key,
+            $3, $3
+       FROM source s
+       LEFT JOIN source parent ON parent.location_id = s.parent_location_id`,
+    [fromSchemeId, toSchemeId, userId],
+  );
+}

@@ -109,3 +109,53 @@ export async function setMapSvg(db: Queryable, schemeId: number, svg: string | n
     [schemeId, svg],
   );
 }
+
+// Publica (con el usuario que publica) o despublica (con null).
+export async function setPublished(db: Queryable, schemeId: number, userId: number | null): Promise<void> {
+  await db.query(
+    `UPDATE schemes
+        SET published_by = $2,
+            published_at = CASE WHEN $2::int IS NULL THEN NULL ELSE now() END,
+            updated_at = now()
+      WHERE scheme_id = $1`,
+    [schemeId, userId],
+  );
+}
+
+// Bloquea el esquema indicado y el que esté activo, en orden de id para que
+// dos activaciones simultáneas no se bloqueen mutuamente.
+export async function lockForActivation(db: Queryable, schemeId: number): Promise<void> {
+  await db.query(
+    "SELECT scheme_id FROM schemes WHERE is_active OR scheme_id = $1 ORDER BY scheme_id FOR UPDATE",
+    [schemeId],
+  );
+}
+
+// Deja `schemeId` como único esquema activo. Primero desactiva el anterior:
+// el índice schemes_single_active no admite dos activos ni por un instante.
+export async function activateScheme(db: Queryable, schemeId: number): Promise<void> {
+  await db.query(
+    "UPDATE schemes SET is_active = false, updated_at = now() WHERE is_active AND scheme_id <> $1",
+    [schemeId],
+  );
+  await db.query(
+    "UPDATE schemes SET is_active = true, updated_at = now() WHERE scheme_id = $1 AND NOT is_active",
+    [schemeId],
+  );
+}
+
+// Crea un esquema nuevo con el nombre indicado y la descripción y el plano
+// de `sourceId`. Nace sin publicar ni activar.
+export async function insertSchemeCopy(
+  db: Queryable,
+  sourceId: number,
+  copy: { name: string; created_by: number },
+): Promise<number> {
+  const { rows } = await db.query<{ scheme_id: number }>(
+    `INSERT INTO schemes (name, short_description, map_svg, created_by)
+     SELECT $2, short_description, map_svg, $3 FROM schemes WHERE scheme_id = $1
+     RETURNING scheme_id`,
+    [sourceId, copy.name, copy.created_by],
+  );
+  return rows[0].scheme_id;
+}

@@ -4,6 +4,7 @@ import { idParam, parse } from "../http/validate.js";
 import { createLocation, setRangeRequiredByLevel } from "../locations/service.js";
 import { createLocationBody, levelNameField } from "../locations/routes.js";
 import { mapsRouter } from "../maps/routes.js";
+import { activateScheme, copyScheme, publishScheme, unpublishScheme } from "./publication.js";
 import * as service from "./service.js";
 
 const nameField = z.string().trim().min(1).max(80);
@@ -26,6 +27,8 @@ const updateSchemeBody = z
     short_description: descriptionField.optional(),
   })
   .refine((changes) => Object.keys(changes).length > 0, "Hay que indicar al menos un campo para modificar");
+
+const copySchemeBody = z.object({ name: nameField.optional() });
 
 const rangeRequiredBody = z.object({
   level_name: levelNameField,
@@ -64,6 +67,27 @@ schemesRouter.post("/:schemeId/locations", async (req, res) => {
 schemesRouter.put("/:schemeId/range-required", async (req, res) => {
   const schemeId = parse(idParam, req.params.schemeId);
   res.json(await setRangeRequiredByLevel(schemeId, parse(rangeRequiredBody, req.body), req.userId!));
+});
+
+// Publicación (decisión 0003 §4). Si el esquema no está listo, publish
+// responde 409 con el detalle de lo que falta (assignment o map).
+schemesRouter.post("/:schemeId/publish", async (req, res) => {
+  res.json(await publishScheme(parse(idParam, req.params.schemeId), req.userId!));
+});
+
+schemesRouter.post("/:schemeId/unpublish", async (req, res) => {
+  res.json(await unpublishScheme(parse(idParam, req.params.schemeId)));
+});
+
+// Lo convierte en el esquema de la búsqueda pública y desactiva el anterior.
+schemesRouter.post("/:schemeId/activate", async (req, res) => {
+  res.json(await activateScheme(parse(idParam, req.params.schemeId)));
+});
+
+// Copia con estructura, códigos, marcas, rangos y plano; sin publicar.
+schemesRouter.post("/:schemeId/copy", async (req, res) => {
+  const schemeId = parse(idParam, req.params.schemeId);
+  res.status(201).json(await copyScheme(schemeId, parse(copySchemeBody, req.body ?? {}), req.userId!));
 });
 
 // Plano del esquema y hoja de códigos (/:schemeId/map, /:schemeId/codes).

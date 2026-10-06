@@ -89,7 +89,7 @@ El código jerárquico permite, además, resaltar grupos completos por prefijo (
 - **Congelado.** Un esquema publicado no admite cambios de estructura, rangos, marcas ni plano.
 - **Despublicar.** Elimina `published_by` y `published_at` y vuelve a permitir cambios. No se puede despublicar el esquema activo: primero hay que activar otro, para que la búsqueda pública nunca se quede sin esquema.
 - **Activar.** Solo se puede activar un esquema publicado. La base de datos ya exige `ASSIGNED` para activar (`schemes_active_valid`); el backend exige además la publicación.
-- **Copiar (recomendado para cambios).** Crea un esquema nuevo, sin publicar ni activar, con la misma estructura, códigos, marcas, rangos y plano. Se trabaja sobre la copia, se publica y se activa; la activación desactiva al anterior en la misma transacción. El esquema anterior queda publicado como historial.
+- **Copiar (recomendado para cambios).** Crea un esquema nuevo, sin publicar ni activar, con la misma estructura, códigos, marcas, rangos y plano. Las ubicaciones reciben ids nuevos pero **conservan sus códigos**, que son únicos por esquema (`UNIQUE (scheme_id, code)`), no en toda la tabla; por eso las etiquetas del plano copiado siguen correspondiendo sin re-etiquetar nada. Se trabaja sobre la copia, se publica y se activa; la activación desactiva al anterior en la misma transacción. El esquema anterior queda publicado como historial.
 
 ## 5. Qué garantiza la base de datos
 

@@ -36,6 +36,34 @@ Un esquema no incluye el plano en las respuestas, solo `has_map`. El `status` lo
 }
 ```
 
+## Publicación
+
+Reglas en la [decisión 0003 §4](decisions/0003-codigos-minimo-y-publicacion.md#4-publicación-congelamiento-y-copias).
+
+| Método y ruta | Cuerpo | Respuesta |
+|---|---|---|
+| `POST /schemes/:schemeId/publish` | — | El esquema publicado. |
+| `POST /schemes/:schemeId/unpublish` | — | El esquema sin publicar, otra vez editable. |
+| `POST /schemes/:schemeId/activate` | — | El esquema activo: el que usa la búsqueda pública. El anterior se desactiva en la misma operación. |
+| `POST /schemes/:schemeId/copy` | `{ name? }` | **201** con la copia (como `GET /schemes/:id`). Por defecto se llama «Copia de …». |
+
+Para publicar, el esquema debe estar en `ASSIGNED` y tener un plano que dibuje todas las ubicaciones obligatorias, sin etiquetas con códigos inexistentes, mal formadas ni repetidas. Si no, la respuesta es **409** y `details` dice qué falta:
+
+```json
+{ "error": "El plano no cumple los requisitos para publicar",
+  "details": { "map": { "missing_required": [{ "code": "1-1-2", "name": "Mueble 2" }], "…": "…" } } }
+```
+
+(con `details.assignment` si falta el mínimo de asignación).
+
+| Situación | Respuesta |
+|---|---|
+| Publicar un esquema ya publicado, o despublicar uno que no lo está | **409** |
+| Despublicar el esquema activo (hay que activar otro antes) | **409** |
+| Activar un esquema sin publicar o deshabilitado | **409** |
+
+La copia conserva la estructura, los **códigos**, las marcas, los rangos y el plano, con ids de ubicación nuevos. Los códigos son únicos por esquema, así que el plano copiado sigue sirviendo sin cambios. Nace sin publicar ni activar.
+
 ## Ubicaciones
 
 | Método y ruta | Cuerpo | Respuesta |
