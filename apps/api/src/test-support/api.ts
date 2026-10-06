@@ -16,13 +16,21 @@ export const skipWithoutDatabase = databaseAvailable ? false : "PostgreSQL no di
 
 export interface ApiResponse {
   status: number;
+  // JSON ya interpretado; cualquier otro contenido, como texto.
   body: any;
+  headers: Headers;
+}
+
+// Cuerpo que no es JSON (p. ej. un SVG), con su Content-Type.
+export interface RawBody {
+  raw: string;
+  contentType: string;
 }
 
 export interface TestApi {
   userId: number;
   // Petición autenticada como el usuario de prueba.
-  request(method: string, path: string, body?: unknown): Promise<ApiResponse>;
+  request(method: string, path: string, body?: unknown | RawBody): Promise<ApiResponse>;
   // Petición sin cookie de sesión.
   anonymous(method: string, path: string, body?: unknown): Promise<ApiResponse>;
   // Elimina todo lo que creó el usuario de prueba, el usuario y cierra el servidor y el pool.
@@ -49,15 +57,20 @@ export async function startTestApi(): Promise<TestApi> {
 
   const send = async (method: string, path: string, body: unknown, cookie?: string): Promise<ApiResponse> => {
     const headers: Record<string, string> = {};
-    if (body !== undefined) headers["Content-Type"] = "application/json";
+    let payload: string | undefined;
+    if (isRawBody(body)) {
+      headers["Content-Type"] = body.contentType;
+      payload = body.raw;
+    } else if (body !== undefined) {
+      headers["Content-Type"] = "application/json";
+      payload = JSON.stringify(body);
+    }
     if (cookie) headers.Cookie = cookie;
-    const response = await fetch(baseUrl + path, {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-    const text = await response.text();
-    return { status: response.status, body: text ? JSON.parse(text) : null };
+    const response = await fetch(baseUrl + path, { method, headers, body: payload });
+    // Se decodifica a mano para conservar la marca BOM (response.text() la quita).
+    const text = new TextDecoder("utf-8", { ignoreBOM: true }).decode(await response.arrayBuffer());
+    const isJson = response.headers.get("content-type")?.includes("application/json");
+    return { status: response.status, body: isJson ? JSON.parse(text) : text || null, headers: response.headers };
   };
 
   return {
@@ -75,4 +88,8 @@ export async function startTestApi(): Promise<TestApi> {
       await pool.end();
     },
   };
+}
+
+function isRawBody(body: unknown): body is RawBody {
+  return typeof body === "object" && body !== null && "raw" in body && "contentType" in body;
 }

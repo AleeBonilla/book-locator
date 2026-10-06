@@ -93,3 +93,37 @@ Reglas completas en la [decisión 0005](decisions/0005-rangos-de-ubicaciones.md)
 | El esquema está publicado | **409** |
 
 Al asignar o borrar un rango, se actualizan los rangos calculados de los ancestros y el `status` del esquema.
+
+## Plano del esquema
+
+Reglas en las decisiones [0003 §3](decisions/0003-codigos-minimo-y-publicacion.md#3-etiquetado-del-plano) y [0006](decisions/0006-validacion-del-plano-svg.md); guía para quienes lo dibujan en [`guia-mapas.md`](guia-mapas.md).
+
+El plano se envía como el archivo SVG tal cual, con `Content-Type: image/svg+xml` (otro tipo responde **415**). Máximo 5 MB (**413**).
+
+| Método y ruta | Respuesta |
+|---|---|
+| `POST /schemes/:schemeId/map/validate` | Reporte del archivo frente al esquema, **sin guardarlo**. |
+| `PUT /schemes/:schemeId/map` | Guarda o reemplaza el plano y devuelve el reporte. **422** si el contenido no es aceptable (el reporte va en `details`); el plano anterior se conserva. |
+| `GET /schemes/:schemeId/map` | El SVG tal como se subió (`image/svg+xml`), con una política de contenido que impide ejecutar código si se abre directamente. |
+| `GET /schemes/:schemeId/map/report` | Reporte del plano guardado frente al árbol **actual** (cambia si después se modificó la estructura o las marcas). |
+| `DELETE /schemes/:schemeId/map` | **204**. |
+| `GET /schemes/:schemeId/codes` | Hoja de códigos: `[{ code, label, name, path, required }]` en orden de árbol. Con `?format=csv`, un archivo para planillas (UTF-8 con BOM, separado por `;`). |
+
+Reporte:
+
+```json
+{
+  "valid": true,
+  "issues": [],
+  "labels": 316,
+  "unknown_codes": [{ "code": "10-2-16", "line": 412 }],
+  "malformed_labels": [{ "id": "loc-6-1-10 2", "line": 87 }],
+  "duplicate_labels": [],
+  "missing_required": [{ "code": "4-2-14", "name": "Mueble 14" }],
+  "publishable": false
+}
+```
+
+- `valid: false` (con `issues`, cada uno con su línea): el contenido no es seguro o no es un SVG válido; el plano no se guarda.
+- `unknown_codes`, `malformed_labels`, `duplicate_labels` y `missing_required` no impiden guardar el plano, pero sí publicar el esquema; `publishable` resume si no hay ninguno.
+- Un esquema publicado no admite cambios de plano (**409**).

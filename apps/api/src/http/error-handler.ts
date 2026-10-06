@@ -1,6 +1,13 @@
 import type { ErrorRequestHandler, RequestHandler } from "express";
 import pg from "pg";
-import { AppError, ConflictError, InvalidInputError, NotFoundError, ValidationError } from "../errors.js";
+import {
+  AppError,
+  ConflictError,
+  InvalidInputError,
+  NotFoundError,
+  UnsupportedMediaTypeError,
+  ValidationError,
+} from "../errors.js";
 
 // Toda respuesta de error de la API tiene esta forma.
 export interface ErrorBody {
@@ -13,6 +20,7 @@ const APP_ERROR_STATUS: [typeof AppError, number][] = [
   [ValidationError, 400],
   [NotFoundError, 404],
   [ConflictError, 409],
+  [UnsupportedMediaTypeError, 415],
   [InvalidInputError, 422],
 ];
 

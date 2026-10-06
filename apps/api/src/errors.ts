@@ -27,3 +27,7 @@ export class InvalidInputError extends AppError {}
 // Los datos no tienen la forma esperada (los lanza http/validate.ts a partir
 // de un esquema de Zod).
 export class ValidationError extends AppError {}
+
+// El cuerpo de la petición no viene en el formato que espera la ruta (p. ej.
+// un plano que no se envía como image/svg+xml).
+export class UnsupportedMediaTypeError extends AppError {}

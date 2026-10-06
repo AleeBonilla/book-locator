@@ -25,13 +25,14 @@ Si tu herramienta no aparece en la sección 6, comprobalo así: exportá un arch
 
 ## 3. Paso a paso
 
-1. **Pedí la hoja de códigos.** La estructura (filas, caras, muebles…) se crea primero en la aplicación, y la aplicación asigna un código a cada ubicación. La hoja lista el código, el nombre y la ruta de cada una:
+1. **Pedí la hoja de códigos.** La estructura (filas, caras, muebles…) se crea primero en la aplicación, y la aplicación asigna un código a cada ubicación. La hoja se descarga desde la aplicación como planilla y lista, para cada ubicación, el código, la etiqueta que debe llevar su figura, el nombre, la ruta y si es obligatoria:
 
    ```text
-   6-1-10    Mueble 10    Fila 6 › Cara 1 › Mueble 10    obligatoria
+   codigo   etiqueta     nombre      ruta                          obligatoria
+   6-1-10   loc-6-1-10   Mueble 10   Fila 6 › Cara 1 › Mueble 10   sí
    ```
 
-   La última columna indica si la estructura es obligatoria en el plano. No inventes códigos ni los calcules por tu cuenta: usá siempre los de la hoja.
+   No inventes códigos ni los calcules por tu cuenta: copiá siempre la columna *etiqueta*.
 
 2. **Dibujá el plano.** Podés usar una imagen o un render de fondo y dibujar encima una figura por cada estructura obligatoria, y por las demás que quieras que se puedan resaltar (sección 4).
 
@@ -39,7 +40,7 @@ Si tu herramienta no aparece en la sección 6, comprobalo así: exportá un arch
 
 4. **Exportá a SVG** (sección 6).
 
-5. **Subí el archivo a la aplicación.** Te responde con un reporte: etiquetas con códigos que no existen, etiquetas mal escritas, estructuras obligatorias sin dibujar o contenido no permitido. Corregí y volvé a subir hasta que no haya errores.
+5. **Validá y subí el archivo.** La aplicación permite **validarlo sin guardarlo** y responde con un reporte: contenido no permitido (con la línea del archivo), etiquetas con códigos que no existen, etiquetas mal escritas y estructuras obligatorias sin dibujar. Corregí hasta que no haya errores y subilo.
 
 Si después de recibir la hoja alguien cambia la estructura en la aplicación (agrega, quita o reordena muebles), **los códigos pueden cambiar**. Pedí una hoja nueva y revisá las etiquetas.
 
@@ -62,11 +63,11 @@ Si después de recibir la hoja alguien cambia la estructura en la aplicación (a
 
 **No permitido** (el archivo se rechaza al subirlo):
 
-- scripts, animaciones interactivas o atributos de eventos (`onclick`, `onload`…);
-- enlaces a otras páginas o recursos externos;
-- contenido HTML incrustado (`foreignObject`).
+- scripts, animaciones o atributos de eventos (`onclick`, `onload`…);
+- enlaces (`<a>`), y referencias a otras páginas o a recursos externos, incluidas imágenes enlazadas en lugar de incrustadas;
+- contenido HTML incrustado (`foreignObject`). Algunas herramientas lo generan para ciertos efectos, como el desenfoque de fondo; si el reporte lo señala, quitá ese efecto.
 
-Estos elementos permitirían ejecutar código en las pantallas de los lectores. Las herramientas de diseño normalmente no los generan; suelen aparecer al editar el SVG a mano o con complementos.
+Estos elementos permitirían ejecutar código en las pantallas de los lectores. Lo habitual en un plano (formas, grupos, imágenes incrustadas, degradados, sombras y otros filtros, textos) está permitido.
 
 ## 5. Cómo etiquetar
 
@@ -83,7 +84,8 @@ loc-<código>
 
 Reglas:
 
-- **Todo en minúsculas**, sin espacios, sin puntos y sin nada después del código.
+- **Solo `loc-`, dígitos y guiones**: en minúsculas, sin espacios, sin puntos y sin nada después del código.
+- **Sin tildes ni ñ en los nombres de las figuras etiquetadas.** Figma, al menos, exporta mal esos caracteres (un «—» queda como «â» seguido de dos caracteres invisibles). Las etiquetas no los necesitan, porque son solo números.
 - **Cada código, una sola vez.** Si duplicás un objeto ya etiquetado, la copia hereda el nombre y la herramienta le agrega algo (`loc-6-1-10 2`, `loc-6-1-10_2`). Renombrala antes de exportar; la aplicación rechaza las etiquetas así.
 - Los objetos sin etiqueta (fondos, paredes, textos) pueden llamarse como quieras, mientras no empiecen con `loc-`.
 - Toda estructura marcada como obligatoria en la hoja debe tener su figura con su propia etiqueta. No alcanza con dibujar sus partes (los anaqueles de un mueble) ni la estructura que la contiene (la cara).
@@ -94,7 +96,7 @@ Reglas:
 
 1. Renombrá cada capa con su etiqueta (doble clic en el nombre de la capa).
 2. Seleccioná el marco del plano y, en el panel *Export*, elegí **SVG**.
-3. En las opciones (`…`), activá **Include "id" attribute**. Sin esta opción el archivo no tendrá etiquetas.
+3. En las opciones (`…`), activá **Include "id" attribute**. Sin esta opción el archivo no tendrá etiquetas. Con ella, Figma escribe el nombre de cada capa como su `id`, sin cambios: una capa llamada `loc-6-1-10` queda como `id="loc-6-1-10"` (verificado con el plano de ejemplo).
 4. Activá **Outline text** si el plano tiene textos.
 
 **Inkscape**
@@ -118,6 +120,8 @@ Reglas:
 | Código inexistente: `loc-6-1-17` | No hay ninguna ubicación con ese código | Revisá la hoja; puede ser un error de tipeo o una hoja vieja |
 | Etiqueta mal formada: `loc-6-1-10 2` | El nombre tiene algo más que `loc-` y el código | Renombrá el objeto; suele ser una copia de otro |
 | Falta una estructura obligatoria: `loc-4-2-7` (Fila 4 › Cara 2 › Mueble 7) | Esa estructura no tiene figura con su etiqueta | Dibujala y etiquetala; sin ella el plano no se puede publicar |
-| Contenido no permitido | El archivo tiene scripts, enlaces externos o HTML incrustado | Exportá de nuevo desde la herramienta, sin complementos |
+| Elemento no permitido: `<foreignObject>`, `<script>`, `<a>`… | El archivo tiene HTML incrustado, código, enlaces o animaciones | Quitá el efecto u objeto que lo genera (el reporte indica la línea) y exportá de nuevo |
+| Enlace no permitido / `url()` hacia un recurso externo | Una imagen o un estilo apunta a otro archivo o a internet | Incrustá la imagen en lugar de enlazarla |
+| El archivo no es un XML válido | El archivo está dañado o incompleto | Exportá de nuevo; no lo edites a mano |
 | Falta `viewBox` | La herramienta no lo escribió | Volvé a exportar con las opciones de la sección 6 |
 | Archivo demasiado grande | Supera los 5 MB | Reducí o comprimí las imágenes de fondo |

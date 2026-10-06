@@ -3,6 +3,7 @@ import { z } from "zod";
 import { idParam, parse } from "../http/validate.js";
 import { createLocation, setRangeRequiredByLevel } from "../locations/service.js";
 import { createLocationBody, levelNameField } from "../locations/routes.js";
+import { mapsRouter } from "../maps/routes.js";
 import * as service from "./service.js";
 
 const nameField = z.string().trim().min(1).max(80);
@@ -64,3 +65,6 @@ schemesRouter.put("/:schemeId/range-required", async (req, res) => {
   const schemeId = parse(idParam, req.params.schemeId);
   res.json(await setRangeRequiredByLevel(schemeId, parse(rangeRequiredBody, req.body), req.userId!));
 });
+
+// Plano del esquema y hoja de códigos (/:schemeId/map, /:schemeId/codes).
+schemesRouter.use("/:schemeId", mapsRouter);

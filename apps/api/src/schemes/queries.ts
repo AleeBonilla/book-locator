@@ -93,3 +93,19 @@ export async function setSchemeStatus(db: Queryable, schemeId: number, status: S
     [schemeId, status],
   );
 }
+
+export async function getMapSvg(db: Queryable, schemeId: number): Promise<string | null> {
+  const { rows } = await db.query<{ map_svg: string | null }>(
+    "SELECT map_svg FROM schemes WHERE scheme_id = $1",
+    [schemeId],
+  );
+  return rows[0]?.map_svg ?? null;
+}
+
+// Guarda el plano, o lo elimina con `svg` null.
+export async function setMapSvg(db: Queryable, schemeId: number, svg: string | null): Promise<void> {
+  await db.query(
+    "UPDATE schemes SET map_svg = $2, updated_at = now() WHERE scheme_id = $1",
+    [schemeId, svg],
+  );
+}
