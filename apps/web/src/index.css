@@ -120,6 +120,92 @@ a {
   background: var(--tec-turquesa);
 }
 
+/* =========================================================
+   Controles compartidos
+   ========================================================= */
+.campo {
+  min-width: 0;
+  height: 40px;
+  padding: 0 var(--e3);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  font-variant-numeric: tabular-nums;
+}
+
+.campo::placeholder {
+  color: #9aa0a6;
+}
+
+.campo:disabled {
+  background: var(--fondo);
+  color: var(--tinta-suave);
+}
+
+.campo-error {
+  border-color: var(--error);
+  box-shadow: inset 0 0 0 1px var(--error);
+}
+
+.boton-principal,
+.boton-secundario,
+.boton-peligro {
+  height: 40px;
+  padding: 0 var(--e4);
+  border-radius: var(--radio);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.boton-principal {
+  border: 0;
+  background: var(--tec-azul);
+  color: #fff;
+}
+
+.boton-principal:hover:not(:disabled) {
+  background: var(--tec-azul-claro);
+}
+
+.boton-secundario {
+  border: 1px solid var(--linea);
+  background: var(--superficie);
+  color: var(--tec-azul);
+}
+
+.boton-secundario:hover:not(:disabled) {
+  border-color: var(--tec-azul);
+}
+
+.boton-peligro {
+  border: 1px solid var(--error);
+  background: var(--superficie);
+  color: var(--error);
+}
+
+.boton-peligro:hover:not(:disabled) {
+  background: #fdf1f1;
+}
+
+.boton-principal:disabled,
+.boton-secundario:disabled,
+.boton-peligro:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.boton-texto {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--tec-azul);
+  font-weight: 560;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -3,8 +3,16 @@ import './MapCanvas.css';
 
 export interface MapHighlight {
   code: string;
-  kind: 'found' | 'neighbor';
+  // found: el resultado de la búsqueda (rojo). neighbor: vecina de un hueco.
+  // selected: la ubicación elegida en el panel de administración.
+  kind: 'found' | 'neighbor' | 'selected';
 }
+
+const FIGURE_CLASS: Record<MapHighlight['kind'], string> = {
+  found: 'figura-encontrada',
+  neighbor: 'figura-vecina',
+  selected: 'figura-seleccionada',
+};
 
 // Zona del lienzo tapada por otros elementos (el panel de búsqueda), en px.
 // Al encuadrar, el plano se acomoda en el resto.
@@ -21,6 +29,8 @@ interface Props {
   getInsets: () => Insets;
   // Cambia con cada búsqueda: dispara el encuadre del resultado.
   focusKey: number;
+  // Clic (sin arrastrar) sobre una figura etiquetada: recibe su código.
+  onFigureClick?: (code: string) => void;
 }
 
 interface Box {
@@ -40,7 +50,7 @@ const CONTROLS_HEIGHT = 64;
 // Plano interactivo: se desplaza arrastrando, se acerca con la rueda, con
 // dos dedos, con doble clic, con el teclado o con los botones. Se trabaja
 // sobre el viewBox del SVG, así el dibujo sigue nítido con cualquier zoom.
-export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
+export function MapCanvas({ svg, highlights, getInsets, focusKey, onFigureClick }: Props) {
   const viewport = useRef<HTMLDivElement>(null);
   const host = useRef<HTMLDivElement>(null);
   const svgEl = useRef<SVGSVGElement | null>(null);
@@ -234,15 +244,15 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
   useEffect(() => {
     const root = svgEl.current;
     if (!root) return;
-    for (const el of root.querySelectorAll('.figura-encontrada, .figura-vecina')) {
-      el.classList.remove('figura-encontrada', 'figura-vecina');
+    for (const el of root.querySelectorAll('.figura-encontrada, .figura-vecina, .figura-seleccionada')) {
+      el.classList.remove(...Object.values(FIGURE_CLASS));
     }
     for (const { code, kind } of highlights) {
       const figure = root.querySelector(`[id="loc-${CSS.escape(code)}"]`);
       if (!figure) continue;
       // Se vuelve a agregar al final del grupo para que quede por encima.
       figure.parentNode?.appendChild(figure);
-      figure.classList.add(kind === 'found' ? 'figura-encontrada' : 'figura-vecina');
+      figure.classList.add(FIGURE_CLASS[kind]);
     }
     // Cada flecha apunta al centro del borde superior de su figura.
     arrowEls.current.length = highlights.length;
@@ -306,8 +316,10 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
 
   // Arrastre con un dedo o el mouse, y pellizco con dos dedos.
   const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pressedAt = useRef<{ x: number; y: number } | null>(null);
   const onPointerDown = (event: React.PointerEvent) => {
     if ((event.target as Element).closest('button')) return;
+    pressedAt.current = pointers.current.size === 0 ? { x: event.clientX, y: event.clientY } : null;
     event.currentTarget.setPointerCapture(event.pointerId);
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     cancelAnimationFrame(animation.current);
@@ -331,6 +343,15 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
     pointers.current.set(event.pointerId, current);
   };
   const onPointerUp = (event: React.PointerEvent) => {
+    // Un clic sin arrastre (menos de 5 px) sobre una figura la selecciona.
+    const start = pressedAt.current;
+    if (onFigureClick && start && pointers.current.size === 1 && Math.hypot(event.clientX - start.x, event.clientY - start.y) < 5) {
+      const figure = document
+        .elementsFromPoint(event.clientX, event.clientY)
+        .find((el) => el.id.startsWith('loc-') && viewport.current?.contains(el));
+      if (figure) onFigureClick(figure.id.slice(4));
+    }
+    pressedAt.current = null;
     pointers.current.delete(event.pointerId);
     if (pointers.current.size === 0) viewport.current?.classList.remove('arrastrando');
   };
@@ -379,7 +400,7 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
           ref={(el) => {
             arrowEls.current[index] = el;
           }}
-          className={highlight.kind === 'found' ? 'lienzo-flecha lienzo-flecha-encontrada' : 'lienzo-flecha lienzo-flecha-vecina'}
+          className={`lienzo-flecha lienzo-flecha-${highlight.kind === 'found' ? 'encontrada' : highlight.kind === 'neighbor' ? 'vecina' : 'seleccionada'}`}
           aria-hidden="true"
         >
           <svg viewBox="0 0 32 44">

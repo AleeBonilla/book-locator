@@ -169,17 +169,6 @@
   opacity: 0.8;
 }
 
-.acceso-listo {
-  padding: var(--e4);
-  border-left: 3px solid var(--tec-turquesa);
-  background: var(--fondo);
-}
-
-.acceso-listo p:first-child {
-  font-weight: 700;
-  color: var(--tec-azul);
-}
-
 .acceso-volver {
   display: inline-block;
   margin-top: var(--e5);
