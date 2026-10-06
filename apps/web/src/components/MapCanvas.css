@@ -1,0 +1,102 @@
+.lienzo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #e8ecf0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.lienzo.arrastrando {
+  cursor: grabbing;
+}
+
+.lienzo:focus-visible {
+  outline: 3px solid var(--tec-turquesa);
+  outline-offset: -3px;
+}
+
+.lienzo-svg,
+.lienzo-svg > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Figuras del plano. Las reglas CSS ganan a los atributos fill/stroke que
+   exporta la herramienta de diseño, así que no hace falta editar el SVG. */
+.lienzo [id^='loc-'] {
+  transition: fill 160ms ease-out;
+}
+
+/* Su libro está aquí: el único uso del rojo BJFF, con un pulso al aparecer. */
+.lienzo .figura-encontrada {
+  fill: var(--bjff-rojo);
+  stroke: #fff;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+  animation: figura-pulso 1100ms cubic-bezier(0.2, 0.7, 0.3, 1) 1;
+}
+
+@keyframes figura-pulso {
+  0% {
+    stroke: rgb(200 32 42 / 0.5);
+    stroke-width: 22px;
+  }
+  100% {
+    stroke: #fff;
+    stroke-width: 1.5px;
+  }
+}
+
+/* Vecinas de un hueco: referencia, no destino. */
+.lienzo .figura-vecina {
+  fill: #fff;
+  stroke: var(--tec-turquesa);
+  stroke-width: 3px;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Controles */
+.lienzo-controles {
+  position: absolute;
+  right: var(--e4);
+  bottom: calc(var(--lienzo-inferior, 0px) + var(--e4));
+  display: flex;
+  gap: var(--e2);
+  align-items: flex-end;
+}
+
+.lienzo-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e2);
+  min-width: 44px;
+  height: 44px;
+  padding: 0 var(--e3);
+  border: 1px solid var(--linea-suave);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  color: var(--tec-azul);
+  font-weight: 560;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(0 40 85 / 0.1);
+}
+
+.lienzo-boton:hover {
+  background: var(--fondo);
+  border-color: var(--linea);
+}
+
+.lienzo-boton svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.lienzo-boton-texto {
+  padding: 0 var(--e4) 0 var(--e3);
+}

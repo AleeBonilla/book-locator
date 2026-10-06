@@ -1,0 +1,24 @@
+.lomo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 7.5rem;
+  padding: 18px var(--e4) var(--e3);
+  background:
+    linear-gradient(var(--bjff-rojo), var(--bjff-rojo)) top / 100% 8px no-repeat,
+    #fff;
+  border: 1px solid #c9ced4;
+  border-radius: 1px;
+  box-shadow: 0 1px 0 rgb(0 40 85 / 0.08);
+  color: #22262a;
+  font-size: 1.625rem;
+  font-weight: 640;
+  font-stretch: 92%;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+}
+
+.lomo-linea {
+  white-space: nowrap;
+}
