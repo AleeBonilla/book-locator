@@ -5,6 +5,7 @@ import {
   ConflictError,
   InvalidInputError,
   NotFoundError,
+  UnavailableError,
   UnsupportedMediaTypeError,
   ValidationError,
 } from "../errors.js";
@@ -22,6 +23,7 @@ const APP_ERROR_STATUS: [typeof AppError, number][] = [
   [ConflictError, 409],
   [UnsupportedMediaTypeError, 415],
   [InvalidInputError, 422],
+  [UnavailableError, 503],
 ];
 
 // Violaciones de restricciones de PostgreSQL. Los servicios validan antes de
@@ -62,7 +64,9 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   }
 
   const [status, body] = toResponse(error);
-  if (status >= 500) {
+  // Solo los errores inesperados van al log; un 503 (p. ej. sin esquema
+  // activo) es una situación prevista.
+  if (status === 500) {
     console.error(`${req.method} ${req.originalUrl} falló:`, error);
   }
   res.status(status).json(body);

@@ -30,9 +30,9 @@ export interface RawBody {
 export interface TestApi {
   userId: number;
   // Petición autenticada como el usuario de prueba.
-  request(method: string, path: string, body?: unknown | RawBody): Promise<ApiResponse>;
+  request(method: string, path: string, body?: unknown | RawBody, headers?: Record<string, string>): Promise<ApiResponse>;
   // Petición sin cookie de sesión.
-  anonymous(method: string, path: string, body?: unknown): Promise<ApiResponse>;
+  anonymous(method: string, path: string, body?: unknown, headers?: Record<string, string>): Promise<ApiResponse>;
   // Elimina todo lo que creó el usuario de prueba, el usuario y cierra el servidor y el pool.
   close(): Promise<void>;
 }
@@ -55,8 +55,14 @@ export async function startTestApi(): Promise<TestApi> {
   await new Promise((resolve) => server.once("listening", resolve));
   const baseUrl = `http://localhost:${(server.address() as AddressInfo).port}`;
 
-  const send = async (method: string, path: string, body: unknown, cookie?: string): Promise<ApiResponse> => {
-    const headers: Record<string, string> = {};
+  const send = async (
+    method: string,
+    path: string,
+    body: unknown,
+    cookie?: string,
+    extraHeaders: Record<string, string> = {},
+  ): Promise<ApiResponse> => {
+    const headers: Record<string, string> = { ...extraHeaders };
     let payload: string | undefined;
     if (isRawBody(body)) {
       headers["Content-Type"] = body.contentType;
@@ -75,8 +81,8 @@ export async function startTestApi(): Promise<TestApi> {
 
   return {
     userId,
-    request: (method, path, body) => send(method, path, body, `${SESSION_COOKIE}=${token}`),
-    anonymous: (method, path, body) => send(method, path, body),
+    request: (method, path, body, headers) => send(method, path, body, `${SESSION_COOKIE}=${token}`, headers),
+    anonymous: (method, path, body, headers) => send(method, path, body, undefined, headers),
     async close() {
       await pool.query(
         "DELETE FROM locations WHERE scheme_id IN (SELECT scheme_id FROM schemes WHERE created_by = $1)",

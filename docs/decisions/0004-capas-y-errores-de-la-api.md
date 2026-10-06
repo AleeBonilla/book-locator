@@ -42,6 +42,8 @@ Toda respuesta de error tiene la forma `{ error, details?, constraint? }`:
 | `NotFoundError` | 404 | esquema o ubicación inexistente |
 | `ConflictError` | 409 | modificar un esquema publicado |
 | `InvalidInputError` (regla de negocio) | 422 | código de clasificación inválido, con su motivo en `details` |
+| `UnsupportedMediaTypeError` | 415 | plano enviado con otro `Content-Type` |
+| `UnavailableError` | 503 | búsqueda sin esquema activo; no se registra en el log |
 | PostgreSQL `23505` (unicidad), `23503` (clave foránea) | 409 | `{ error: "Ya hay otro esquema activo", constraint: "schemes_single_active" }` |
 | PostgreSQL `23514` (CHECK y triggers de validación) | 422 | `locations_code_hierarchy` |
 | JSON mal formado o cuerpo demasiado grande | 400 / 413 | `{ error: "El cuerpo de la petición no es JSON válido" }` |
@@ -57,6 +59,7 @@ El login conserva su respuesta genérica (`"Se requieren identifier y password"`
 - **Funciones puras** (`classification`): pruebas unitarias.
 - **Middleware de errores:** una app mínima levantada en un puerto libre y consultada con `fetch`.
 - **Servicios y consultas:** contra el PostgreSQL de desarrollo. Las pruebas se omiten si la base no está disponible y no dejan datos: deshacen sus cambios o eliminan lo que crearon.
+- **Un archivo de prueba a la vez** (`--test-concurrency=1`): varias pruebas activan esquemas, y solo puede haber uno activo en toda la base, así que en paralelo se pisarían. Las que activan uno restauran al terminar el que estaba activo en la base de desarrollo.
 
 ## Consecuencias
 

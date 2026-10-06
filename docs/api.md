@@ -10,7 +10,40 @@ Cuerpos y respuestas en JSON. Los errores siguen el formato de la [decisión 000
 | `POST /auth/logout` | Cierra la sesión. |
 | `GET /auth/me` | Usuario de la sesión. |
 
-Las rutas de administración (`/schemes`, `/locations`) responden **401** sin sesión.
+Las rutas de administración (`/schemes`, `/locations`) responden **401** sin sesión. Las de búsqueda (`/search`) son públicas.
+
+## Búsqueda pública
+
+Reglas en la [decisión 0007](decisions/0007-busqueda-publica.md).
+
+| Método y ruta | Respuesta |
+|---|---|
+| `GET /search?code=…` | Dónde está el código en el esquema activo. **422** si el código es inválido; **503** si no hay esquema activo. |
+| `GET /search/map` | Plano del esquema activo (`image/svg+xml`), con `ETag` (**304** si no cambió). |
+
+```json
+{
+  "code": "001.42H557m^4",
+  "scheme": { "scheme_id": 3, "name": "Sala general" },
+  "found": true,
+  "results": [{
+    "relation": "contains",
+    "range": { "start": "001.42A543c", "end": "001.42M321m^5" },
+    "path": [
+      { "location_id": 1, "code": "6", "name": "Fila 6", "level_name": "Fila", "position": 6, "siblings": 10 },
+      { "location_id": 7, "code": "6-1", "name": "Cara 1", "level_name": "Cara", "position": 1, "siblings": 2 },
+      { "location_id": 42, "code": "6-1-10", "name": "Mueble 10", "level_name": "Mueble", "position": 10, "siblings": 16 },
+      { "location_id": 315, "code": "6-1-10-3", "name": "Anaquel 3", "level_name": "Anaquel", "position": 3, "siblings": 5 }
+    ],
+    "highlight_code": "6-1-10",
+    "below_highlight": [
+      { "location_id": 315, "code": "6-1-10-3", "name": "Anaquel 3", "level_name": "Anaquel", "position": 3, "siblings": 5 }
+    ]
+  }]
+}
+```
+
+`relation` es `contains` (el rango contiene el código; puede haber varios si se solapan) o, si `found` es `false`, `before` / `after` (las ubicaciones a cada lado del hueco). `highlight_code` es la figura del plano que hay que resaltar (`id="loc-<código>"`).
 
 ## Esquemas
 

@@ -23,6 +23,7 @@ services:
       - ./database/002-sessions.sql:/docker-entrypoint-initdb.d/002-sessions.sql:ro
       - ./database/003-location-codes-and-publication.sql:/docker-entrypoint-initdb.d/003-location-codes-and-publication.sql:ro
       - ./database/004-location-code-hierarchy.sql:/docker-entrypoint-initdb.d/004-location-code-hierarchy.sql:ro
+      - ./database/005-range-search-indexes.sql:/docker-entrypoint-initdb.d/005-range-search-indexes.sql:ro
 
     healthcheck:
       # Docker ejecuta este comando para comprobar que PostgreSQL acepta conexiones.

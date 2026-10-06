@@ -31,3 +31,7 @@ export class ValidationError extends AppError {}
 // El cuerpo de la petición no viene en el formato que espera la ruta (p. ej.
 // un plano que no se envía como image/svg+xml).
 export class UnsupportedMediaTypeError extends AppError {}
+
+// La operación no puede atenderse por ahora, p. ej. la búsqueda pública
+// cuando no hay ningún esquema activo.
+export class UnavailableError extends AppError {}
