@@ -1,3 +1,6 @@
 node_modules
 dist/
 .env
+
+# Planos de trabajo en la raíz (los de prueba viven en apps/api/src/maps/fixtures)
+/*.svg
