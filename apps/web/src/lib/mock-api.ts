@@ -46,6 +46,10 @@ export async function search(code: string): Promise<SearchResponse> {
       result('after', [4, 2, 1, 1], { start: '721 A118b', end: '725.2 C177F' }),
     ]);
   }
+  // Rango cargado a nivel de mueble: no hay anaquel que indicar.
+  if (key === '863 m378a') {
+    return response(code, true, [result('contains', [2, 2, 7], { start: '863 A100', end: '863 Z999' })]);
+  }
   if (key === '001.42 h557m4') {
     return response(code, true, [result('contains', [6, 1, 10, 3], { start: '001.42A543c', end: '001.42M321m^5' })]);
   }
@@ -65,22 +69,24 @@ function response(code: string, found: boolean, results: SearchResult[]): Search
   return { code, scheme: SCHEME, found, results };
 }
 
-// Arma un resultado para Fila › Cara › Mueble › Anaquel. El plano dibuja los
-// muebles, así que esa es la figura a resaltar.
+// Arma un resultado para Fila › Cara › Mueble › Anaquel (o hasta Mueble, si
+// el rango está a ese nivel). El plano dibuja los muebles, así que esa es la
+// figura a resaltar.
 function result(
   relation: SearchResult['relation'],
-  [fila, cara, mueble, anaquel]: [number, number, number, number],
+  [fila, cara, mueble, anaquel]: [number, number, number, number?],
   range: { start: string; end: string },
 ): SearchResult {
   const steps: [string, number, number][] = [
     ['Fila', fila, 10],
     ['Cara', cara, 2],
     ['Mueble', mueble, muebles(fila)],
-    ['Anaquel', anaquel, ANAQUELES_POR_MUEBLE],
   ];
+  if (anaquel !== undefined) steps.push(['Anaquel', anaquel, ANAQUELES_POR_MUEBLE]);
+  const segments = [fila, cara, mueble, anaquel];
   const path: PathStep[] = steps.map(([levelName, position, siblings], index) => ({
     location_id: 1000 + index,
-    code: [fila, cara, mueble, anaquel].slice(0, index + 1).join('-'),
+    code: segments.slice(0, index + 1).join('-'),
     name: `${levelName} ${position}`,
     level_name: levelName,
     position,

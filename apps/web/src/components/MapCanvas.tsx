@@ -45,6 +45,9 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const svgEl = useRef<SVGSVGElement | null>(null);
   const content = useRef<Box>({ x: 0, y: 0, w: 1, h: 1 });
+  // Área de las figuras etiquetadas (los muebles): la vista inicial y la de
+  // «Ver todo» la encuadran, en lugar del plano completo con sus márgenes.
+  const overview = useRef<Box | null>(null);
   const view = useRef<Box>({ x: 0, y: 0, w: 1, h: 1 });
   const animation = useRef(0);
   const getInsetsRef = useRef(getInsets);
@@ -132,8 +135,8 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
 
   const fitAll = useCallback(
     (animate: boolean) => {
-      const c = content.current;
-      const pad = 0.04;
+      const c = overview.current ?? content.current;
+      const pad = 0.06;
       const target = viewFor({ x: c.x - c.w * pad, y: c.y - c.h * pad, w: c.w * (1 + 2 * pad), h: c.h * (1 + 2 * pad) });
       if (animate) animateTo(target);
       else setView(target);
@@ -145,28 +148,7 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
   const highlightBox = useCallback((): Box | null => {
     const root = svgEl.current;
     if (!root || highlights.length === 0) return null;
-    const rootInverse = root.getScreenCTM()?.inverse();
-    if (!rootInverse) return null;
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-    for (const { code } of highlights) {
-      const figure = root.querySelector<SVGGraphicsElement>(`[id="loc-${CSS.escape(code)}"]`);
-      const ctm = figure?.getScreenCTM();
-      if (!figure || !ctm) continue;
-      const toRoot = rootInverse.multiply(ctm);
-      const b = figure.getBBox();
-      for (const [px, py] of [[b.x, b.y], [b.x + b.width, b.y], [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]]) {
-        const p = new DOMPoint(px, py).matrixTransform(toRoot);
-        minX = Math.min(minX, p.x);
-        minY = Math.min(minY, p.y);
-        maxX = Math.max(maxX, p.x);
-        maxY = Math.max(maxY, p.y);
-      }
-    }
-    if (minX === Infinity) return null;
-    return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+    return boxOf(root, highlights.map(({ code }) => root.querySelector<SVGGraphicsElement>(`[id="loc-${CSS.escape(code)}"]`)));
   }, [highlights]);
 
   const focusHighlights = useCallback(() => {
@@ -195,6 +177,7 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
     root.removeAttribute('height');
     root.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     root.setAttribute('aria-hidden', 'true');
+    overview.current = boxOf(root, [...root.querySelectorAll<SVGGraphicsElement>('[id^="loc-"]')]);
     fitAll(false);
   }, [svg, fitAll]);
 
@@ -379,4 +362,30 @@ export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
       </div>
     </div>
   );
+}
+
+// Caja que abarca los elementos indicados, en unidades del SVG raíz (tiene en
+// cuenta las transformaciones de los grupos que los contienen).
+function boxOf(root: SVGSVGElement, elements: (SVGGraphicsElement | null)[]): Box | null {
+  const rootInverse = root.getScreenCTM()?.inverse();
+  if (!rootInverse) return null;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const element of elements) {
+    const ctm = element?.getScreenCTM();
+    if (!element || !ctm) continue;
+    const toRoot = rootInverse.multiply(ctm);
+    const b = element.getBBox();
+    for (const [px, py] of [[b.x, b.y], [b.x + b.width, b.y], [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]]) {
+      const p = new DOMPoint(px, py).matrixTransform(toRoot);
+      minX = Math.min(minX, p.x);
+      minY = Math.min(minY, p.y);
+      maxX = Math.max(maxX, p.x);
+      maxY = Math.max(maxY, p.y);
+    }
+  }
+  if (minX === Infinity) return null;
+  return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
 }

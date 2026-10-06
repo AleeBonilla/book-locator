@@ -1,6 +1,6 @@
-// Frente del mueble con sus anaqueles, el buscado en rojo. En un mueble, la
-// posición 1 es el anaquel superior (decisión 0001 §3).
-export function ShelfDiagram({ position, total }: { position: number; total: number }) {
+// Frente del mueble con sus anaqueles; los indicados, marcados. En un mueble,
+// la posición 1 es el anaquel superior (decisión 0001 §3).
+export function ShelfDiagram({ positions, total }: { positions: number[]; total: number }) {
   const shelf = 9;
   const gap = 5;
   const width = 44;
@@ -15,7 +15,7 @@ export function ShelfDiagram({ position, total }: { position: number; total: num
           y={2 + gap + index * (shelf + gap)}
           width={width - 8}
           height={shelf}
-          className={index + 1 === position ? 'mueble-anaquel mueble-anaquel-buscado' : 'mueble-anaquel'}
+          className={positions.includes(index + 1) ? 'mueble-anaquel mueble-anaquel-buscado' : 'mueble-anaquel'}
         />
       ))}
     </svg>

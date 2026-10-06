@@ -24,7 +24,8 @@ type MapState = { status: 'loading' } | { status: 'ready'; svg: string } | { sta
 const EJEMPLOS = [
   { code: '001.42 H557m4', label: 'un anaquel' },
   { code: '658.8 K87m14', label: 'dos anaqueles' },
-  { code: '720 B12', label: 'entre dos anaqueles' },
+  { code: '863 M378a', label: 'rango por mueble' },
+  { code: '720 B12', label: 'entre dos muebles' },
   { code: '004.0195-236-i^2', label: 'mal escrita' },
 ];
 

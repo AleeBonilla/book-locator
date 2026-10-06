@@ -1,42 +1,48 @@
 import type { PathStep, SearchResponse, SearchResult } from '../lib/api-types.ts';
 import { ShelfDiagram } from './ShelfDiagram.tsx';
-import { SpineLabel } from './SpineLabel.tsx';
 
-const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno', 'décimo'];
+// La búsqueda pública no muestra la estructura interna (filas, caras,
+// códigos, rangos): señala el mueble en el plano y, si hay rangos cargados por
+// anaquel, cuál anaquel revisar.
+
+const ORDINALES = ['primer', 'segundo', 'tercer', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno', 'décimo'];
 const ordinal = (n: number) => ORDINALES[n - 1] ?? `${n}.º`;
 
-// Ruta hasta la figura resaltada en el plano: «Fila 6, Cara 1, Mueble 10».
-function drawnPath(result: SearchResult): PathStep[] {
-  return result.path.slice(0, result.path.length - result.below_highlight.length);
+const lista = (items: string[]) =>
+  items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} o ${items.at(-1)}`;
+
+const capitalizar = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
+// Nivel por debajo de la figura marcada en el plano (p. ej. el anaquel), si
+// el rango se cargó a ese nivel.
+const shelfOf = (result: SearchResult): PathStep | undefined => result.below_highlight.at(-1);
+
+// Agrupa los resultados por figura del plano: dos anaqueles del mismo mueble
+// se describen juntos.
+function byFigure(results: SearchResult[]): SearchResult[][] {
+  const groups = new Map<string, SearchResult[]>();
+  for (const result of results) {
+    const key = result.highlight_code ?? result.path.at(-1)!.code;
+    groups.set(key, [...(groups.get(key) ?? []), result]);
+  }
+  return [...groups.values()];
 }
 
-function Place({ result, showRange = true }: { result: SearchResult; showRange?: boolean }) {
-  const drawn = drawnPath(result);
+function Shelves({ results, tone }: { results: SearchResult[]; tone: 'encontrado' | 'vecino' }) {
+  const shelves = results.map(shelfOf).filter((step): step is PathStep => step !== undefined);
+  if (shelves.length === 0) return null;
+  const positions = [...new Set(shelves.map((step) => step.position))].sort((a, b) => a - b);
+  const level = shelves[0].level_name.toLowerCase();
+  const total = shelves[0].siblings;
   return (
-    <div className="lugar">
-      <ol className="lugar-ruta">
-        {drawn.map((step, index) => (
-          <li key={step.code} className={index === drawn.length - 1 ? 'lugar-paso lugar-paso-marcado' : 'lugar-paso'}>
-            {step.name}
-          </li>
-        ))}
-      </ol>
-      {result.below_highlight.map((step) => (
-        <div key={step.code} className="lugar-anaquel">
-          <ShelfDiagram position={step.position} total={step.siblings} />
-          <p>
-            <strong>{step.name}</strong>
-            <span>
-              El {ordinal(step.position)} de {step.siblings}, contando desde arriba
-            </span>
-          </p>
-        </div>
-      ))}
-      {showRange && (
-        <p className="lugar-rango">
-          Rango: {result.range.start} a {result.range.end}
-        </p>
-      )}
+    <div className={`anaquel anaquel-${tone}`}>
+      <ShelfDiagram positions={positions} total={total} />
+      <p>
+        <strong>
+          {capitalizar(lista(positions.map(ordinal)))} {level}
+        </strong>
+        <span>contando desde arriba, de {total}</span>
+      </p>
     </div>
   );
 }
@@ -44,68 +50,39 @@ function Place({ result, showRange = true }: { result: SearchResult; showRange?:
 export function SearchResults({ response }: { response: SearchResponse }) {
   const containing = response.results.filter((result) => result.relation === 'contains');
 
-  if (containing.length === 1) {
+  if (containing.length > 0) {
+    const groups = byFigure(containing);
     return (
-      <section className="resultado" aria-labelledby="resultado-titulo">
-        <h2 id="resultado-titulo" className="visualmente-oculto">
-          Ubicación de {response.code}
-        </h2>
-        <div className="resultado-principal">
-          <SpineLabel code={response.code} />
-          <Place result={containing[0]} />
-        </div>
+      <section className="resultado" aria-label={`Ubicación de ${response.code}`}>
+        <p className="resultado-donde">
+          <span className="marca marca-encontrado" aria-hidden="true" />
+          {groups.length === 1
+            ? 'Está en el mueble marcado en el plano.'
+            : `Puede estar en cualquiera de los ${groups.length} muebles marcados en el plano.`}
+        </p>
+        {groups.length === 1 && <Shelves results={groups[0]} tone="encontrado" />}
+        {groups.length === 1 && groups[0].length > 1 && (
+          <p className="resultado-nota">Puede estar en cualquiera de los dos: revise ambos.</p>
+        )}
       </section>
     );
   }
 
-  if (containing.length > 1) {
-    return (
-      <section className="resultado" aria-labelledby="resultado-titulo">
-        <div className="resultado-cabecera">
-          <SpineLabel code={response.code} />
-          <div>
-            <h2 id="resultado-titulo" className="resultado-titulo">
-              Puede estar en {containing.length} anaqueles
-            </h2>
-            <p className="resultado-nota">Los rangos de estos anaqueles se superponen: revise ambos.</p>
-          </div>
-        </div>
-        {containing.map((result) => (
-          <Place key={result.path.at(-1)!.code} result={result} />
-        ))}
-      </section>
-    );
-  }
-
-  const before = response.results.find((result) => result.relation === 'before');
-  const after = response.results.find((result) => result.relation === 'after');
+  // El código cae en un hueco entre dos rangos.
+  const neighbors = response.results;
+  const groups = byFigure(neighbors);
   return (
-    <section className="resultado" aria-labelledby="resultado-titulo">
-      <div className="resultado-cabecera">
-        <SpineLabel code={response.code} />
-        <div>
-          <h2 id="resultado-titulo" className="resultado-titulo">
-            No hay un anaquel asignado a esta signatura
-          </h2>
-          <p className="resultado-nota">
-            {before && after
-              ? 'Por el orden de la colección, debería estar entre estos dos anaqueles, marcados en el plano.'
-              : 'Por el orden de la colección, debería estar junto a este anaquel, marcado en el plano.'}
-          </p>
-        </div>
-      </div>
-      {before && (
-        <div className="vecina">
-          <p className="vecina-titulo">Antes, termina en {before.range.end}</p>
-          <Place result={before} showRange={false} />
-        </div>
-      )}
-      {after && (
-        <div className="vecina">
-          <p className="vecina-titulo">Después, empieza en {after.range.start}</p>
-          <Place result={after} showRange={false} />
-        </div>
-      )}
+    <section className="resultado" aria-label={`Ubicación aproximada de ${response.code}`}>
+      <p className="resultado-titulo">No hay un lugar asignado a esta signatura.</p>
+      <p className="resultado-donde">
+        <span className="marca marca-vecino" aria-hidden="true" />
+        {groups.length > 1
+          ? 'Por el orden de la colección, debería estar entre los dos muebles marcados en el plano.'
+          : neighbors.length > 1
+            ? 'Por el orden de la colección, debería estar en el mueble marcado en el plano, entre estos anaqueles.'
+            : 'Por el orden de la colección, debería estar junto al mueble marcado en el plano.'}
+      </p>
+      {groups.length === 1 && <Shelves results={groups[0]} tone="vecino" />}
     </section>
   );
 }
