@@ -27,7 +27,7 @@
   width: min(420px, calc(100% - 2 * var(--e4)));
   max-height: calc(100% - 2 * var(--e4));
   overflow-y: auto;
-  padding: var(--e6) var(--e5) var(--e5);
+  padding: var(--e5) var(--e5) var(--e5);
   background: var(--superficie);
   border-radius: var(--radio);
   box-shadow: var(--sombra-panel);
@@ -105,13 +105,6 @@
 
 .campo-mensaje-error {
   color: var(--error);
-}
-
-.campo-detalle {
-  display: block;
-  margin-top: var(--e1);
-  color: var(--tinta-suave);
-  font-size: var(--t-1);
 }
 
 /* =========================================================
@@ -332,6 +325,17 @@
   .panel-titulo {
     font-size: var(--t2);
     margin-bottom: var(--e4);
+  }
+
+  /* Con un resultado, el título ya cumplió su función: se oculta para que
+     la respuesta quede a la vista. */
+  .con-resultado .panel-titulo {
+    display: none;
+  }
+
+  .con-resultado .resultado {
+    margin-top: var(--e4);
+    padding-top: var(--e4);
   }
 
   .lomo {

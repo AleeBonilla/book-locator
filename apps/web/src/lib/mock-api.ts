@@ -46,7 +46,7 @@ export async function search(code: string): Promise<SearchResponse> {
       result('after', [4, 2, 1, 1], { start: '721 A118b', end: '725.2 C177F' }),
     ]);
   }
-  if (key === '001.42 h557m 4') {
+  if (key === '001.42 h557m4') {
     return response(code, true, [result('contains', [6, 1, 10, 3], { start: '001.42A543c', end: '001.42M321m^5' })]);
   }
 

@@ -212,3 +212,28 @@
     font-size: var(--t3);
   }
 }
+
+/* Pantallas bajas (p. ej. una notebook): la foto se vuelve más panorámica
+   para que la tarjeta entre completa sin desplazarse. */
+@media (min-width: 480px) and (max-height: 760px) {
+  .acceso {
+    padding-block: var(--e5);
+  }
+
+  .acceso-foto img {
+    aspect-ratio: 16 / 5;
+  }
+
+  .acceso-cuerpo {
+    padding-top: var(--e5);
+  }
+
+  .acceso-titulo {
+    margin: var(--e2) 0 var(--e4);
+    font-size: var(--t3);
+  }
+
+  .acceso-formulario {
+    gap: var(--e3);
+  }
+}

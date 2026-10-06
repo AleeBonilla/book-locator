@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router';
 import { MapCanvas, type Insets, type MapHighlight } from '../components/MapCanvas.tsx';
 import { SearchResults } from '../components/SearchResults.tsx';
@@ -22,7 +22,7 @@ type MapState = { status: 'loading' } | { status: 'ready'; svg: string } | { sta
 
 // Signaturas para revisar cada estado del diseño en el prototipo.
 const EJEMPLOS = [
-  { code: '001.42 H557m 4', label: 'un anaquel' },
+  { code: '001.42 H557m4', label: 'un anaquel' },
   { code: '658.8 K87m14', label: 'dos anaqueles' },
   { code: '720 B12', label: 'entre dos anaqueles' },
   { code: '004.0195-236-i^2', label: 'mal escrita' },
@@ -47,25 +47,27 @@ export function SearchPage() {
   }, []);
 
   // Zona del plano que tapa el panel: a la izquierda en escritorio, abajo en
-  // celular. El plano encuadra los resultados en el resto.
+  // celular. El plano encuadra los resultados en el resto. Se mide en el
+  // momento (measureInsets) y, además, se guarda para ubicar los controles.
+  const measureInsets = useCallback((): Insets => {
+    const el = panel.current;
+    if (!el) return { left: 0, bottom: 0 };
+    const parent = el.parentElement!.getBoundingClientRect();
+    const box = el.getBoundingClientRect();
+    return matchMedia('(max-width: 719px)').matches
+      ? { left: 0, bottom: parent.bottom - box.top }
+      : { left: box.right - parent.left + 16, bottom: 0 };
+  }, []);
+
   useEffect(() => {
     const el = panel.current;
     if (!el) return;
-    const narrow = matchMedia('(max-width: 719px)');
-    const measure = () => {
-      const parent = el.parentElement!.getBoundingClientRect();
-      const box = el.getBoundingClientRect();
-      setInsets(
-        narrow.matches
-          ? { left: 0, bottom: parent.bottom - box.top }
-          : { left: box.right - parent.left + 16, bottom: 0 },
-      );
-    };
+    const measure = () => setInsets(measureInsets());
     const observer = new ResizeObserver(measure);
     observer.observe(el);
     observer.observe(el.parentElement!);
     return () => observer.disconnect();
-  }, []);
+  }, [measureInsets]);
 
   // La signatura viaja en la dirección (?codigo=…), así una búsqueda se
   // puede compartir o recargar. Si cambia la dirección (atrás, adelante, un
@@ -147,11 +149,11 @@ export function SearchPage() {
       <SiteHeader />
       <main className="busqueda-principal" style={{ '--lienzo-inferior': `${insets.bottom}px` } as CSSProperties}>
         {map.status === 'ready' && (
-          <MapCanvas svg={map.svg} highlights={highlights} insets={insets} focusKey={focusKey} />
+          <MapCanvas svg={map.svg} highlights={highlights} getInsets={measureInsets} focusKey={focusKey} />
         )}
         {map.status === 'loading' && <div className="busqueda-cargando" aria-hidden="true" />}
 
-        <div ref={panel} className="panel">
+        <div ref={panel} className={state.status === 'done' ? 'panel con-resultado' : 'panel'}>
           <h1 className="titulo panel-titulo">¿Dónde está su libro?</h1>
 
           {state.status === 'unavailable' || map.status === 'unavailable' ? (
@@ -170,12 +172,12 @@ export function SearchPage() {
                   className={invalid ? 'campo campo-error' : 'campo'}
                   value={code}
                   onChange={(event) => setCode(event.target.value)}
-                  placeholder="001.42 H557m 4"
+                  placeholder="001.42 H557m4"
                   autoComplete="off"
                   autoCapitalize="off"
                   spellCheck={false}
                   aria-invalid={invalid}
-                  aria-describedby={invalid ? 'signatura-error' : 'signatura-ayuda'}
+                  aria-describedby={invalid ? 'signatura-error' : state.status === 'idle' ? 'signatura-ayuda' : undefined}
                   enterKeyHint="search"
                 />
                 <button type="submit" className="boton-principal" disabled={state.status === 'loading'}>
@@ -184,13 +186,14 @@ export function SearchPage() {
               </div>
               {invalid ? (
                 <p id="signatura-error" className="campo-mensaje-error">
-                  No se reconoce esa signatura. Escríbala como aparece en el catálogo, por ejemplo 001.42 H557m 4.
-                  <span className="campo-detalle">{state.reason}.</span>
+                  No se reconoce esa signatura. Escríbala como aparece en el catálogo, por ejemplo 001.42 H557m4.
                 </p>
               ) : (
-                <p id="signatura-ayuda" className="campo-ayuda">
-                  Cópiela del catálogo, tal como aparece en el registro del libro.
-                </p>
+                state.status === 'idle' && (
+                  <p id="signatura-ayuda" className="campo-ayuda">
+                    Cópiela del catálogo, tal como aparece en el registro del libro.
+                  </p>
+                )
               )}
             </form>
           )}

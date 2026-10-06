@@ -16,7 +16,9 @@ export interface Insets {
 interface Props {
   svg: string;
   highlights: MapHighlight[];
-  insets: Insets;
+  // Se consulta en el momento de encuadrar, para usar la medida actual del
+  // panel (que crece al mostrar un resultado).
+  getInsets: () => Insets;
   // Cambia con cada búsqueda: dispara el encuadre del resultado.
   focusKey: number;
 }
@@ -31,21 +33,24 @@ interface Box {
 const MAX_ZOOM = 12; // el viewBox más chico es el contenido / 12
 const MIN_ZOOM = 0.6; // y el más grande, el contenido / 0,6
 const ANIMATION_MS = 450;
+// Alto de la fila de controles, abajo a la derecha: al encuadrar, la figura
+// no debe quedar debajo de ellos.
+const CONTROLS_HEIGHT = 64;
 
 // Plano interactivo: se desplaza arrastrando, se acerca con la rueda, con
 // dos dedos, con doble clic, con el teclado o con los botones. Se trabaja
 // sobre el viewBox del SVG, así el dibujo sigue nítido con cualquier zoom.
-export function MapCanvas({ svg, highlights, insets, focusKey }: Props) {
+export function MapCanvas({ svg, highlights, getInsets, focusKey }: Props) {
   const viewport = useRef<HTMLDivElement>(null);
   const host = useRef<HTMLDivElement>(null);
   const svgEl = useRef<SVGSVGElement | null>(null);
   const content = useRef<Box>({ x: 0, y: 0, w: 1, h: 1 });
   const view = useRef<Box>({ x: 0, y: 0, w: 1, h: 1 });
   const animation = useRef(0);
-  const insetsRef = useRef(insets);
+  const getInsetsRef = useRef(getInsets);
   useLayoutEffect(() => {
-    insetsRef.current = insets;
-  }, [insets]);
+    getInsetsRef.current = getInsets;
+  }, [getInsets]);
 
   const apply = () => {
     const { x, y, w, h } = view.current;
@@ -105,11 +110,11 @@ export function MapCanvas({ svg, highlights, insets, focusKey }: Props) {
   // aspecto del lienzo para que el SVG no se deforme ni deje bandas.
   const viewFor = useCallback((box: Box): Box => {
     const el = viewport.current!;
-    const { left, bottom } = insetsRef.current;
+    const { left, bottom } = getInsetsRef.current();
     const cw = el.clientWidth;
     const ch = el.clientHeight;
     const freeW = Math.max(cw - left, cw * 0.4);
-    const freeH = Math.max(ch - bottom, ch * 0.4);
+    const freeH = Math.max(ch - bottom - CONTROLS_HEIGHT, ch * 0.3);
     // Unidades del SVG por píxel para que la caja entre en la zona libre.
     const scale = Math.max(box.w / freeW, box.h / freeH);
     const w = cw * scale;

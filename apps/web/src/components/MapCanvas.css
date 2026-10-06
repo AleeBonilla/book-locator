@@ -53,7 +53,7 @@
 
 /* Vecinas de un hueco: referencia, no destino. */
 .lienzo .figura-vecina {
-  fill: #fff;
+  fill: #c6eeef;
   stroke: var(--tec-turquesa);
   stroke-width: 3px;
   vector-effect: non-scaling-stroke;
