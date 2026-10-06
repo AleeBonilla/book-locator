@@ -42,7 +42,10 @@ Además, la raíz debe ser `<svg>` con `viewBox`, y el archivo no puede superar 
 
 ### Defensa en profundidad
 
-La validación del backend no es la única barrera. La página pública debe leer el SVG como XML (`DOMParser` con `image/svg+xml`) y pasarlo por DOMPurify antes de insertarlo.
+La validación del backend no es la única barrera. La página pública pasa el SVG por DOMPurify antes de insertarlo (`apps/web/src/lib/sanitize-map.ts`):
+
+- **Mismo parser para limpiar e insertar.** DOMPurify usa su parser HTML predeterminado, el mismo con el que `innerHTML` interpreta el resultado, para que lo revisado sea lo que se dibuja. *Corrige una versión anterior de esta decisión, que proponía leerlo como XML:* en ese modo DOMPurify descarta atributos con mayúsculas como `patternContentUnits`, y las imágenes de fondo de Figma dejaban de verse.
+- **`<use>` solo con referencias internas.** DOMPurify elimina `<use>` por defecto; Figma lo necesita para dibujar las imágenes de fondo dentro de `<pattern>`, así que se habilita solo con `href` hacia `#id`.
 
 ## Alternativas consideradas
 

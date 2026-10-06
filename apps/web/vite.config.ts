@@ -16,5 +16,8 @@ export default defineConfig({
   server: {
     // Permite leer el parser y el plano de ejemplo que viven en apps/api.
     fs: { allow: ['..'] },
+    // Desde WSL, los archivos del disco de Windows (/mnt/c/…) no avisan cuando
+    // cambian: hay que revisarlos periódicamente para que Vite recargue.
+    watch: { usePolling: process.cwd().startsWith('/mnt/') },
   },
 })

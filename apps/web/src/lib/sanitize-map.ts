@@ -12,11 +12,14 @@ DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
   }
 });
 
+// Se usa el parser HTML de DOMPurify (el predeterminado), el mismo con el que
+// innerHTML interpreta el resultado al insertarlo: así lo que se revisa es lo
+// mismo que se dibuja. En modo XML (application/xhtml+xml) DOMPurify compara
+// los nombres de atributo distinguiendo mayúsculas y descarta, por ejemplo,
+// patternContentUnits, y las imágenes de fondo dejan de verse.
 export function sanitizeMap(svg: string): string {
   return DOMPurify.sanitize(svg, {
     USE_PROFILES: { svg: true, svgFilters: true },
     ADD_TAGS: ['use'],
-    // Se interpreta como XML, igual que en el backend.
-    PARSER_MEDIA_TYPE: 'application/xhtml+xml',
   });
 }
