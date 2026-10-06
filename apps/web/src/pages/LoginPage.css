@@ -211,6 +211,10 @@
   .acceso-titulo {
     font-size: var(--t3);
   }
+
+  .acceso-prototipo {
+    padding: 0 var(--e5) var(--e5);
+  }
 }
 
 /* Pantallas bajas (p. ej. una notebook): la foto se vuelve más panorámica

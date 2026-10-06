@@ -73,7 +73,7 @@ export function SearchResults({ response }: { response: SearchResponse }) {
   const groups = byFigure(neighbors);
   return (
     <section className="resultado" aria-label={`Ubicación aproximada de ${response.code}`}>
-      <p className="resultado-titulo">No hay un lugar asignado a esta signatura.</p>
+      <p className="resultado-titulo">No hay un lugar asignado a este código de clasificación.</p>
       <p className="resultado-donde">
         <span className="marca marca-vecino" aria-hidden="true" />
         {groups.length > 1

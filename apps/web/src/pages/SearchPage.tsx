@@ -20,7 +20,7 @@ type Answer = SearchState & { request: string };
 
 type MapState = { status: 'loading' } | { status: 'ready'; svg: string } | { status: 'unavailable' };
 
-// Signaturas para revisar cada estado del diseño en el prototipo.
+// Códigos para revisar cada estado del diseño en el prototipo.
 const EJEMPLOS = [
   { code: '001.42 H557m4', label: 'un anaquel' },
   { code: '658.8 K87m14', label: 'dos anaqueles' },
@@ -33,7 +33,7 @@ export function SearchPage() {
   const [params, setParams] = useSearchParams();
   const [code, setCode] = useState(params.get('codigo') ?? '');
   const [answer, setAnswer] = useState<Answer | null>(null);
-  // Sube al volver a buscar la misma signatura, para repetir la búsqueda.
+  // Sube al volver a buscar el mismo código, para repetir la búsqueda.
   const [attempt, setAttempt] = useState(0);
   const [map, setMap] = useState<MapState>({ status: 'loading' });
   const [focusKey, setFocusKey] = useState(0);
@@ -70,7 +70,7 @@ export function SearchPage() {
     return () => observer.disconnect();
   }, [measureInsets]);
 
-  // La signatura viaja en la dirección (?codigo=…), así una búsqueda se
+  // El código viaja en la dirección (?codigo=…), así una búsqueda se
   // puede compartir o recargar. Si cambia la dirección (atrás, adelante, un
   // ejemplo), el campo toma el nuevo valor durante el render.
   const query = params.get('codigo') ?? '';
@@ -164,12 +164,12 @@ export function SearchPage() {
             </div>
           ) : (
             <form className="formulario" onSubmit={submit} role="search">
-              <label htmlFor="signatura" className="campo-etiqueta">
-                Signatura
+              <label htmlFor="codigo" className="campo-etiqueta">
+                Código de clasificación
               </label>
               <div className="formulario-fila">
                 <input
-                  id="signatura"
+                  id="codigo"
                   className={invalid ? 'campo campo-error' : 'campo'}
                   value={code}
                   onChange={(event) => setCode(event.target.value)}
@@ -178,7 +178,7 @@ export function SearchPage() {
                   autoCapitalize="off"
                   spellCheck={false}
                   aria-invalid={invalid}
-                  aria-describedby={invalid ? 'signatura-error' : state.status === 'idle' ? 'signatura-ayuda' : undefined}
+                  aria-describedby={invalid ? 'codigo-error' : state.status === 'idle' ? 'codigo-ayuda' : undefined}
                   enterKeyHint="search"
                 />
                 <button type="submit" className="boton-principal" disabled={state.status === 'loading'}>
@@ -186,13 +186,13 @@ export function SearchPage() {
                 </button>
               </div>
               {invalid ? (
-                <p id="signatura-error" className="campo-mensaje-error">
-                  No se reconoce esa signatura. Escríbala como aparece en el catálogo, por ejemplo 001.42 H557m4.
+                <p id="codigo-error" className="campo-mensaje-error">
+                  No se reconoce ese código de clasificación. Escríbalo como aparece en el catálogo, por ejemplo 001.42 H557m4.
                 </p>
               ) : (
                 state.status === 'idle' && (
-                  <p id="signatura-ayuda" className="campo-ayuda">
-                    Cópiela del catálogo, tal como aparece en el registro del libro.
+                  <p id="codigo-ayuda" className="campo-ayuda">
+                    Cópielo del catálogo, tal como aparece en el registro del libro.
                   </p>
                 )
               )}
