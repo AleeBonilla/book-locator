@@ -2,7 +2,7 @@
 
 **Versión 1.0.0**
 
-Este documento define cómo se convierte una estructura válida de [`normalization.md`](normalization.md) en una clave que PostgreSQL puede comparar directamente, con el mismo resultado que las reglas de [`classification-ordering.md`](classification-ordering.md). La implementación está en `apps/api/src/classification/sort-key.ts`.
+Este documento define cómo se convierte una estructura válida de [`normalization.md`](normalization.md) en una clave que PostgreSQL puede comparar directamente, con el mismo resultado que las reglas de [`classification-ordering.md`](classification-ordering.md). La implementación está en `packages/classification/src/sort-key.ts`.
 
 ## 1. Por qué una clave binaria
 
@@ -66,6 +66,6 @@ La clave no se edita a mano ni se calcula en SQL. Si cambian las reglas de norma
 
 ## 5. Verificación
 
-`apps/api/src/classification/compare.test.ts` comprueba que, para todos los pares de una muestra variada de códigos, el signo de `Buffer.compare` entre sus claves coincide con el de la comparación directa de las reglas (`compare.ts`), y que se cumplen los casos de referencia de [ordenamiento, sección 10](classification-ordering.md#10-casos-de-referencia).
+`packages/classification/src/compare.test.ts` comprueba que, para todos los pares de una muestra variada de códigos, el signo de `Buffer.compare` entre sus claves coincide con el de la comparación directa de las reglas (`compare.ts`), y que se cumplen los casos de referencia de [ordenamiento, sección 10](classification-ordering.md#10-casos-de-referencia).
 
 Al crear este formato también se comprobó con PostgreSQL 16: las 3 064 claves de los códigos válidos del inventario de estantes, ordenadas con `ORDER BY key`, quedaron exactamente en el mismo orden que con `compare.ts`.
