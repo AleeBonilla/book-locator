@@ -3,13 +3,20 @@ import pg from "pg";
 
 // Un Pool mantiene varias conexiones abiertas y las reutiliza entre consultas,
 // en vez de abrir una conexión nueva a Postgres por cada petición HTTP.
-export const pool = new pg.Pool({
-  host: process.env.DB_HOST || "localhost",
-  port: Number(process.env.DB_PORT) || 5432,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-});
+//
+// En producción la conexión llega como DATABASE_URL (así la entrega Neon,
+// con ?sslmode=require para cifrarla); en desarrollo, por partes (DB_*).
+export const pool = new pg.Pool(
+  process.env.DATABASE_URL
+    ? { connectionString: process.env.DATABASE_URL }
+    : {
+        host: process.env.DB_HOST || "localhost",
+        port: Number(process.env.DB_PORT) || 5432,
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+      },
+);
 
 // Un error en una conexión inactiva del pool no debe tumbar el proceso.
 pool.on("error", (error) => {

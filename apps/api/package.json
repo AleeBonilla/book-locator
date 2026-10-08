@@ -8,7 +8,8 @@
     "dev": "tsx watch --conditions=source src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "create-user": "tsx --conditions=source src/scripts/create-user.ts"
+    "create-user": "tsx --conditions=source src/scripts/create-user.ts",
+    "migrate": "tsx --conditions=source src/scripts/migrate.ts"
   },
   "keywords": [],
   "author": "",
