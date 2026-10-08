@@ -1,6 +1,4 @@
-// Formas de las respuestas de la API de administración (docs/api.md). El
-// prototipo las reproduce para que conectar el backend no cambie las
-// pantallas.
+// Formas de las respuestas de la API de administración (docs/api.md).
 
 export type SchemeStatus = 'DRAFT' | 'LOCATIONS_DEFINED' | 'PARTIALLY_ASSIGNED' | 'ASSIGNED';
 

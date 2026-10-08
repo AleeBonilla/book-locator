@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { formatDate, statusText } from '../../lib/admin-format.ts';
 import type { SchemeRow } from '../../lib/admin-types.ts';
-import { copyScheme, createScheme, listSchemes } from '../../lib/mock-admin.ts';
+import { copyScheme, createScheme, listSchemes } from '../../lib/admin-api.ts';
 
 // Lista de esquemas: el punto de entrada del panel.
 export function SchemesPage() {
