@@ -9,6 +9,7 @@ import { analyzeAssignment } from '@api/schemes/assignment.ts';
 import { ApiError } from './api-types.ts';
 import type { LocationNode, MapReport, SchemeDetail, SchemeRow } from './admin-types.ts';
 import { fetchMap } from './mock-api.ts';
+import type { NewLocation, Rename } from './structure.ts';
 
 interface StoredLocation {
   id: number;
@@ -367,14 +368,37 @@ export async function setMinimumLevel(schemeId: number, levelName: string): Prom
 // Ubicaciones
 // ---------------------------------------------------------------------------
 
-export async function createLocation(
-  schemeId: number,
-  input: { parent_location_id: number | null; name: string; level_name: string },
-): Promise<void> {
-  await wait();
+// Crea varias ubicaciones, con su contenido, al final de las hijas de
+// `parentId`. Propuesta para el backend: POST /schemes/:id/locations/batch,
+// en una sola transacción.
+export async function createLocations(schemeId: number, parentId: number | null, items: NewLocation[]): Promise<void> {
+  await wait(300);
   const scheme = schemeOrFail(schemeId);
   assertEditable(scheme, true);
-  addLocation(scheme, input.parent_location_id, input.name, input.level_name);
+  const add = (parent: number | null, list: NewLocation[]) => {
+    for (const item of list) {
+      const location = addLocation(scheme, parent, item.name, item.level_name);
+      location.required = item.range_required;
+      add(location.id, item.children);
+    }
+  };
+  add(parentId, items);
+  touch(scheme);
+}
+
+// Cambia el nombre o el nivel de varias ubicaciones a la vez. Propuesta para
+// el backend: PATCH /schemes/:id/locations, en una sola transacción.
+export async function updateLocations(schemeId: number, changes: Rename[]): Promise<void> {
+  if (changes.length === 0) return;
+  await wait();
+  const scheme = schemeOrFail(schemeId);
+  assertEditable(scheme);
+  for (const change of changes) {
+    const location = scheme.locations.find((l) => l.id === change.location_id);
+    if (!location) throw new ApiError(422, `La ubicación ${change.location_id} no pertenece al esquema`);
+    if (change.name !== undefined) location.name = change.name;
+    if (change.level_name !== undefined) location.levelName = change.level_name;
+  }
   touch(scheme);
 }
 
