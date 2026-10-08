@@ -4,7 +4,7 @@ import { checkDatabase } from "./db.js";
 import { authRouter } from "./auth/routes.js";
 import { requireAuth } from "./auth/middleware.js";
 import { errorHandler, notFoundHandler } from "./http/error-handler.js";
-import { locationsRouter } from "./locations/routes.js";
+import { BATCH_LOCATIONS_PATH, locationsRouter } from "./locations/routes.js";
 import { schemesRouter } from "./schemes/routes.js";
 import { searchRouter } from "./search/routes.js";
 
@@ -14,6 +14,9 @@ export function createApp(): express.Express {
   const app = express();
 
   // Middlewares: se ejecutan en orden para cada petición, antes de las rutas.
+  // El alta en lote de ubicaciones admite cuerpos más grandes (hasta
+  // MAX_BATCH_LOCATIONS); el parser general ya no vuelve a leer ese cuerpo.
+  app.use(BATCH_LOCATIONS_PATH, express.json({ limit: "2mb" }));
   app.use(express.json()); // convierte el cuerpo JSON en req.body
   app.use(cookieParser()); // convierte la cabecera Cookie en req.cookies
 
