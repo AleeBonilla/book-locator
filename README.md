@@ -43,3 +43,7 @@ npm test                         # paquete y API (la API necesita la base levant
 npm run lint -w bjff-book-locator-web
 npm run build                    # paquete, API (apps/api/dist) y web (apps/web/dist)
 ```
+
+## Despliegue
+
+Web en Vercel, API en Render y base en Neon, con planes gratuitos: [`docs/despliegue.md`](docs/despliegue.md).
