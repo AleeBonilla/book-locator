@@ -23,6 +23,7 @@ npm install                      # en la raíz; también compila @bjff/classific
 docker compose up -d             # PostgreSQL 16 con las migraciones
 cp apps/api/.env.example apps/api/.env   # DB_PASSWORD: la de docker-compose.yaml
 npm run create-user -w api -- --username ana --email ana@example.com --name "Ana Pérez"
+npm run seed-demo -w api -- --activate   # opcional: esquema de demostración (database/demo)
 ```
 
 Después, en dos terminales:

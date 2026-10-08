@@ -34,9 +34,10 @@ export DATABASE_URL='postgres://…?sslmode=require'   # la cadena de Neon
 
 npm run migrate -w api      # aplica database/001…005 y las anota en schema_migrations
 npm run create-user -w api -- --username ana --email ana@example.com --name "Ana Pérez"
+npm run seed-demo -w api -- --activate   # opcional: la sala general de demostración
 ```
 
-`create-user` pide la contraseña por teclado. Cuando haya migraciones nuevas, se vuelve a correr `npm run migrate -w api` con la misma variable: solo aplica las pendientes.
+`create-user` pide la contraseña por teclado. `seed-demo` crea, publica y pone en uso un esquema con la estructura del plano y los rangos limpios del inventario ([datos de demostración](../database/demo/README.md)); sin él, la búsqueda pública responde «no está disponible» hasta que se active un esquema desde el panel. Cuando haya migraciones nuevas, se vuelve a correr `npm run migrate -w api` con la misma variable: solo aplica las pendientes.
 
 Para dejar de usar Neon en la terminal, `unset DATABASE_URL`: sin ella, la API vuelve a usar la base local (`DB_*` de `apps/api/.env`).
 
