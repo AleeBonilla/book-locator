@@ -102,6 +102,8 @@ La copia conserva la estructura, los **códigos**, las marcas, los rangos y el p
 | Método y ruta | Cuerpo | Respuesta |
 |---|---|---|
 | `POST /schemes/:schemeId/locations` | `{ parent_location_id?, name, level_name, level_name_override?, position? }` | **201** con la ubicación. Sin `position`, va al final de sus hermanos. |
+| `POST /schemes/:schemeId/locations/batch` | `{ parent_location_id?, locations: [{ name, level_name, level_name_override?, range_required?, children? }] }` | **201** con `{ created, locations }`: cuántas se crearon y el árbol creado. Ver [Alta en lote](#alta-en-lote). |
+| `PATCH /schemes/:schemeId/locations` | `{ changes: [{ location_id, name?, level_name?, level_name_override?, range_required? }] }` | `{ updated }`. Los mismos cambios que `PATCH /locations/:id`, para varias ubicaciones del esquema a la vez. |
 | `PATCH /locations/:locationId` | `{ name?, level_name?, level_name_override?, range_required? }` | La ubicación modificada. |
 | `POST /locations/:locationId/move` | `{ parent_location_id, position? }` | La ubicación en su nuevo lugar. `parent_location_id: null` la convierte en raíz. |
 | `DELETE /locations/:locationId` | — | **204**. Elimina también todo su subárbol. |
@@ -130,12 +132,37 @@ Una ubicación en la respuesta:
 - `code`, `level` y `sort_order` los calcula el backend: al crear, mover o eliminar, se recalculan los códigos de los hermanos y subárboles afectados ([decisión 0003 §1](decisions/0003-codigos-minimo-y-publicacion.md#1-los-códigos-de-ubicación-los-genera-el-backend)).
 - `position` es la posición final entre los hermanos (1 = primera). Una posición mayor que la cantidad de hermanos + 1 responde **422**.
 
+### Alta en lote
+
+El panel arma la estructura de la sala (niveles y cuántas ubicaciones hay de cada uno) y la crea con una sola petición:
+
+```json
+{
+  "parent_location_id": null,
+  "locations": [
+    { "name": "Fila 1", "level_name": "Fila", "children": [
+      { "name": "Cara 1", "level_name": "Cara", "children": [
+        { "name": "Mueble 1", "level_name": "Mueble", "range_required": true }
+      ] }
+    ] },
+    { "name": "Mesa de consulta 1", "level_name": "Mesa de consulta" }
+  ]
+}
+```
+
+- Las del primer nivel van al final de las hijas de `parent_location_id` (o de las raíces), y cada una con lo que contiene. Códigos, niveles y posiciones se calculan igual que en el alta individual.
+- Todo ocurre en una transacción: si algo falla, no se crea nada.
+- Hasta 10 000 ubicaciones y 12 niveles por petición; más responde **400**. Esta ruta admite cuerpos de hasta 2 MB (las demás, 100 KB).
+- Los nombres («Fila 1», «Mesa de consulta 1») los decide el panel; el backend los guarda tal cual.
+
+`PATCH /schemes/:schemeId/locations` también es una transacción. Lo usa el panel para renombrar un nivel en todo el árbol y para renumerar los nombres automáticos después de mover o eliminar. Una ubicación de otro esquema responde **422**; un `location_id` repetido o un cambio sin campos, **400**.
+
 ### Cuándo se rechaza un cambio
 
 | Situación | Respuesta |
 |---|---|
 | El esquema está publicado (cualquier cambio, incluido su nombre) | **409** |
-| Crear, mover o eliminar ubicaciones si alguna tiene rango ([0001 §4](decisions/0001-ubicaciones-y-mapas.md#4-el-árbol-queda-fijo-mientras-haya-rangos)) | **409** |
+| Crear (también en lote), mover o eliminar ubicaciones si alguna tiene rango ([0001 §4](decisions/0001-ubicaciones-y-mapas.md#4-el-árbol-queda-fijo-mientras-haya-rangos)) | **409** |
 | El padre no pertenece al esquema, o se mueve una ubicación dentro de su propio subárbol | **422** |
 | Datos con forma incorrecta (campos vacíos, tipos) | **400** |
 

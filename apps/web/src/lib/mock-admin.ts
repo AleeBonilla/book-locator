@@ -369,7 +369,7 @@ export async function setMinimumLevel(schemeId: number, levelName: string): Prom
 // ---------------------------------------------------------------------------
 
 // Crea varias ubicaciones, con su contenido, al final de las hijas de
-// `parentId`. Propuesta para el backend: POST /schemes/:id/locations/batch,
+// `parentId`. Equivale a POST /schemes/:id/locations/batch (docs/api.md),
 // en una sola transacción.
 export async function createLocations(schemeId: number, parentId: number | null, items: NewLocation[]): Promise<void> {
   await wait(300);
@@ -386,8 +386,8 @@ export async function createLocations(schemeId: number, parentId: number | null,
   touch(scheme);
 }
 
-// Cambia el nombre o el nivel de varias ubicaciones a la vez. Propuesta para
-// el backend: PATCH /schemes/:id/locations, en una sola transacción.
+// Cambia el nombre o el nivel de varias ubicaciones a la vez. Equivale a
+// PATCH /schemes/:id/locations (docs/api.md), en una sola transacción.
 export async function updateLocations(schemeId: number, changes: Rename[]): Promise<void> {
   if (changes.length === 0) return;
   await wait();
