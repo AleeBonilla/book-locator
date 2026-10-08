@@ -109,6 +109,98 @@ export async function insertLocation(
   return rows[0];
 }
 
+export interface NewLocationRow {
+  parent_location_id: number | null;
+  level: number;
+  level_name: string;
+  level_name_override: string | null;
+  name: string;
+  code: string;
+  sort_order: number;
+  range_required: boolean;
+}
+
+// Inserta varias ubicaciones en una sola sentencia. Quien llama calcula
+// level, code y sort_order; los padres tienen que existir ya (el alta en lote
+// inserta un nivel del árbol por vez).
+export async function insertLocations(
+  db: Queryable,
+  schemeId: number,
+  locations: NewLocationRow[],
+  userId: number,
+): Promise<LocationRow[]> {
+  const column = <K extends keyof NewLocationRow>(key: K) => locations.map((location) => location[key]);
+  const { rows } = await db.query<LocationRow>(
+    `INSERT INTO locations (
+       scheme_id, parent_location_id, level, level_name, level_name_override,
+       name, code, sort_order, range_required, created_by, updated_by
+     )
+     SELECT $1, parent_id, level, level_name, level_name_override, name, code, sort_order, range_required, $2, $2
+       FROM unnest($3::int[], $4::int[], $5::text[], $6::text[], $7::text[], $8::text[], $9::int[], $10::bool[])
+         AS t(parent_id, level, level_name, level_name_override, name, code, sort_order, range_required)
+     RETURNING ${LOCATION_COLUMNS}`,
+    [
+      schemeId,
+      userId,
+      column("parent_location_id"),
+      column("level"),
+      column("level_name"),
+      column("level_name_override"),
+      column("name"),
+      column("code"),
+      column("sort_order"),
+      column("range_required"),
+    ],
+  );
+  return rows;
+}
+
+// Ubicaciones de la lista que no pertenecen al esquema.
+export async function locationsOutsideScheme(db: Queryable, schemeId: number, locationIds: number[]): Promise<number[]> {
+  const { rows } = await db.query<{ location_id: number }>(
+    `SELECT id AS location_id
+       FROM unnest($2::int[]) AS id
+      WHERE NOT EXISTS (SELECT 1 FROM locations WHERE scheme_id = $1 AND location_id = id)`,
+    [schemeId, locationIds],
+  );
+  return rows.map((row) => row.location_id);
+}
+
+export interface LocationChanges {
+  location_id: number;
+  name?: string;
+  level_name?: string;
+  level_name_override?: string | null;
+  range_required?: boolean;
+}
+
+// Aplica cambios de nombre, nivel y marca del mínimo a varias ubicaciones en
+// una sola sentencia. Devuelve cuántas se modificaron.
+export async function updateLocations(db: Queryable, changes: LocationChanges[], userId: number): Promise<number> {
+  const { rowCount } = await db.query(
+    `UPDATE locations l
+        SET name = COALESCE(c.name, l.name),
+            level_name = COALESCE(c.level_name, l.level_name),
+            level_name_override = CASE WHEN c.set_override THEN c.override ELSE l.level_name_override END,
+            range_required = COALESCE(c.range_required, l.range_required),
+            updated_by = $1,
+            updated_at = now()
+       FROM unnest($2::int[], $3::text[], $4::text[], $5::bool[], $6::text[], $7::bool[])
+         AS c(location_id, name, level_name, set_override, override, range_required)
+      WHERE l.location_id = c.location_id`,
+    [
+      userId,
+      changes.map((change) => change.location_id),
+      changes.map((change) => change.name ?? null),
+      changes.map((change) => change.level_name ?? null),
+      changes.map((change) => change.level_name_override !== undefined),
+      changes.map((change) => change.level_name_override ?? null),
+      changes.map((change) => change.range_required ?? null),
+    ],
+  );
+  return rowCount ?? 0;
+}
+
 export async function updateLocation(
   db: Queryable,
   locationId: number,

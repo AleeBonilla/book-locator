@@ -1,8 +1,14 @@
 import { Router } from "express";
 import { z } from "zod";
 import { idParam, parse } from "../http/validate.js";
-import { createLocation, setRangeRequiredByLevel } from "../locations/service.js";
-import { createLocationBody, levelNameField } from "../locations/routes.js";
+import { createLocation, createLocations, setRangeRequiredByLevel, updateLocations } from "../locations/service.js";
+import {
+  checkBatchSize,
+  createLocationBody,
+  createLocationsBody,
+  levelNameField,
+  updateLocationsBody,
+} from "../locations/routes.js";
 import { mapsRouter } from "../maps/routes.js";
 import { activateScheme, copyScheme, publishScheme, unpublishScheme } from "./publication.js";
 import * as service from "./service.js";
@@ -61,6 +67,21 @@ schemesRouter.post("/:schemeId/locations", async (req, res) => {
   const schemeId = parse(idParam, req.params.schemeId);
   const body = parse(createLocationBody, req.body);
   res.status(201).json(await createLocation(schemeId, body, req.userId!));
+});
+
+// Crea un árbol de ubicaciones de una vez (la estructura que arma el panel).
+// app.ts le da a esta ruta un límite de cuerpo de 2 MB.
+schemesRouter.post("/:schemeId/locations/batch", async (req, res) => {
+  const schemeId = parse(idParam, req.params.schemeId);
+  checkBatchSize(req.body);
+  res.status(201).json(await createLocations(schemeId, parse(createLocationsBody, req.body), req.userId!));
+});
+
+// Renombra o marca varias ubicaciones del esquema a la vez.
+schemesRouter.patch("/:schemeId/locations", async (req, res) => {
+  const schemeId = parse(idParam, req.params.schemeId);
+  const { changes } = parse(updateLocationsBody, req.body);
+  res.json(await updateLocations(schemeId, changes, req.userId!));
 });
 
 // Marca o desmarca como mínimo de asignación todas las ubicaciones de un nivel.
