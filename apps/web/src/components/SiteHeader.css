@@ -1,0 +1,62 @@
+/* Barra institucional en el azul TEC, como la de tec.ac.cr. */
+.encabezado {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--e5);
+  min-height: 60px;
+  padding: var(--e2) var(--e5);
+  background: var(--tec-azul);
+  color: #fff;
+}
+
+.encabezado a {
+  color: inherit;
+}
+
+.encabezado-marca {
+  font-size: var(--t1);
+  font-stretch: var(--ancho-titulo);
+  font-weight: var(--peso-titulo);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.encabezado-institucion {
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--e5);
+  border-left: 1px solid rgb(255 255 255 / 0.35);
+  font-size: var(--t-1);
+  line-height: 1.35;
+  color: rgb(255 255 255 / 0.85);
+}
+
+.encabezado-acceso {
+  margin-left: auto;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.encabezado-acceso:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 719px) {
+  .encabezado {
+    gap: var(--e4);
+    min-height: 52px;
+    padding: var(--e2) var(--e4);
+  }
+
+  .encabezado-marca {
+    font-size: 1.0625rem;
+  }
+
+  .encabezado-institucion {
+    display: none;
+  }
+}

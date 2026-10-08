@@ -1,0 +1,158 @@
+.lienzo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #e8ecf0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.lienzo.arrastrando {
+  cursor: grabbing;
+}
+
+.lienzo:focus-visible {
+  outline: 3px solid var(--tec-turquesa);
+  outline-offset: -3px;
+}
+
+.lienzo-svg,
+.lienzo-svg > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Figuras del plano. Las reglas CSS ganan a los atributos fill/stroke que
+   exporta la herramienta de diseño, así que no hace falta editar el SVG. */
+.lienzo [id^='loc-'] {
+  transition: fill 160ms ease-out;
+}
+
+/* Su libro está aquí: el único uso del rojo BJFF, con un pulso al aparecer. */
+.lienzo .figura-encontrada {
+  fill: var(--bjff-rojo);
+  stroke: #fff;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+  animation: figura-pulso 1100ms cubic-bezier(0.2, 0.7, 0.3, 1) 1;
+}
+
+@keyframes figura-pulso {
+  0% {
+    stroke: rgb(200 32 42 / 0.5);
+    stroke-width: 22px;
+  }
+  100% {
+    stroke: #fff;
+    stroke-width: 1.5px;
+  }
+}
+
+/* Vecinas de un hueco: referencia, no destino. */
+.lienzo .figura-vecina {
+  fill: #c6eeef;
+  stroke: var(--tec-turquesa);
+  stroke-width: 3px;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Controles */
+.lienzo-controles {
+  position: absolute;
+  right: var(--e4);
+  bottom: calc(var(--lienzo-inferior, 0px) + var(--e4));
+  display: flex;
+  gap: var(--e2);
+  align-items: flex-end;
+}
+
+.lienzo-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e2);
+  min-width: 44px;
+  height: 44px;
+  padding: 0 var(--e3);
+  border: 1px solid var(--linea-suave);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  color: var(--tec-azul);
+  font-weight: 560;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(0 40 85 / 0.1);
+}
+
+.lienzo-boton:hover {
+  background: var(--fondo);
+  border-color: var(--linea);
+}
+
+.lienzo-boton svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.lienzo-boton-texto {
+  padding: 0 var(--e4) 0 var(--e3);
+}
+
+/* Flecha que apunta a la figura resaltada. Su punta está en (0, 0) del
+   contenedor, que MapCanvas ubica sobre el borde superior de la figura; el
+   tamaño no cambia con el zoom. Flota suavemente para llamar la atención. */
+.lienzo-flecha {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.lienzo-flecha svg {
+  position: absolute;
+  left: -22px;
+  top: -66px;
+  width: 44px;
+  height: 60px;
+  overflow: visible;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.35));
+  animation: flecha-flota 1.4s ease-in-out infinite;
+}
+
+.lienzo-flecha path {
+  stroke: #fff;
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+.lienzo-flecha-encontrada path {
+  fill: var(--bjff-rojo);
+}
+
+.lienzo-flecha-vecina svg {
+  width: 34px;
+  height: 46px;
+  left: -17px;
+  top: -52px;
+}
+
+.lienzo-flecha-vecina path {
+  fill: var(--tec-turquesa);
+}
+
+@keyframes flecha-flota {
+  0%,
+  100% {
+    transform: translateY(-9px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,131 @@
+@import '@fontsource-variable/roboto-flex/standard.css';
+
+/* =========================================================
+   Tokens (plan de diseño aprobado)
+   ========================================================= */
+:root {
+  /* Color */
+  --tec-azul: #002855;          /* barra institucional, títulos, acción principal */
+  --tec-azul-claro: #0b3a70;    /* azul al pasar el cursor */
+  --tec-turquesa: #00a2a8;      /* acento de estructura y foco */
+  --bjff-rojo: #c8202a;         /* único uso: «su libro está aquí» */
+  --tinta: #4c4c4c;             /* texto */
+  --tinta-suave: #6b6f73;       /* texto secundario */
+  --linea: #808080;             /* líneas y bordes de campos */
+  --linea-suave: #d9dde2;       /* separadores tenues */
+  --fondo: #f6f8fa;
+  --superficie: #ffffff;
+  --error: #d20000;
+
+  /* Tipografía: Roboto Flex. Los títulos usan el eje de ancho. */
+  --fuente: 'Roboto Flex Variable', Roboto, system-ui, sans-serif;
+  --ancho-titulo: 125%;
+  --peso-titulo: 850;
+
+  /* Escala tipográfica (1,25) sobre 16 px */
+  --t-1: 0.8125rem;  /* 13 */
+  --t0: 1rem;        /* 16 */
+  --t1: 1.25rem;     /* 20 */
+  --t2: 1.5625rem;   /* 25 */
+  --t3: 1.9375rem;   /* 31 */
+  --t4: 2.4375rem;   /* 39 */
+
+  /* Espaciado (múltiplos de 4) */
+  --e1: 4px;
+  --e2: 8px;
+  --e3: 12px;
+  --e4: 16px;
+  --e5: 24px;
+  --e6: 32px;
+  --e7: 48px;
+
+  --radio: 2px;
+  --sombra-panel: 0 1px 2px rgb(0 40 85 / 0.12), 0 8px 24px rgb(0 40 85 / 0.14);
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente);
+  font-size: var(--t0);
+  line-height: 1.5;
+  color: var(--tinta);
+  background: var(--fondo);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--tec-azul);
+  text-underline-offset: 3px;
+}
+
+/* Foco visible solo con teclado, en el turquesa institucional. */
+:focus-visible {
+  outline: 3px solid var(--tec-turquesa);
+  outline-offset: 2px;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Título con el eje de ancho, y la barrita turquesa de las secciones TEC. */
+.titulo {
+  font-stretch: var(--ancho-titulo);
+  font-weight: var(--peso-titulo);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--tec-azul);
+}
+
+.titulo::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  margin-top: var(--e3);
+  background: var(--tec-turquesa);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

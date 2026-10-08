@@ -1,0 +1,294 @@
+/* El plano ocupa toda el área bajo la barra; el panel flota encima. */
+.busqueda {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100dvh;
+}
+
+.busqueda-principal {
+  position: relative;
+  overflow: hidden;
+}
+
+.busqueda-cargando {
+  position: absolute;
+  inset: 0;
+  background: #e8ecf0;
+}
+
+/* =========================================================
+   Panel
+   ========================================================= */
+.panel {
+  position: absolute;
+  top: var(--e4);
+  left: var(--e4);
+  z-index: 1;
+  width: min(420px, calc(100% - 2 * var(--e4)));
+  max-height: calc(100% - 2 * var(--e4));
+  overflow-y: auto;
+  padding: var(--e5) var(--e5) var(--e5);
+  background: var(--superficie);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra-panel);
+}
+
+.panel-titulo {
+  font-size: var(--t3);
+  margin-bottom: var(--e5);
+}
+
+/* Formulario */
+.campo-etiqueta {
+  display: block;
+  margin-bottom: var(--e2);
+  font-weight: 600;
+  color: var(--tec-azul);
+}
+
+.formulario-fila {
+  display: flex;
+  gap: var(--e2);
+}
+
+.campo {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 var(--e3);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.campo::placeholder {
+  color: #9aa0a6;
+}
+
+.campo-error {
+  border-color: var(--error);
+  box-shadow: inset 0 0 0 1px var(--error);
+}
+
+.boton-principal {
+  height: 48px;
+  padding: 0 var(--e5);
+  border: 0;
+  border-radius: var(--radio);
+  background: var(--tec-azul);
+  color: #fff;
+  font-weight: 640;
+  cursor: pointer;
+}
+
+.boton-principal:hover {
+  background: var(--tec-azul-claro);
+}
+
+.boton-principal:disabled {
+  cursor: progress;
+  opacity: 0.8;
+}
+
+.campo-ayuda,
+.campo-mensaje-error {
+  margin-top: var(--e2);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.campo-ayuda {
+  color: var(--tinta-suave);
+}
+
+.campo-mensaje-error {
+  color: var(--error);
+}
+
+/* =========================================================
+   Resultado
+   ========================================================= */
+.resultado {
+  margin-top: var(--e5);
+  padding-top: var(--e5);
+  border-top: 1px solid var(--linea-suave);
+}
+
+.resultado-titulo {
+  margin-bottom: var(--e2);
+  font-size: var(--t1);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--tec-azul);
+}
+
+/* «Está en el mueble marcado en el plano», con la misma marca que el plano. */
+.resultado-donde {
+  display: flex;
+  gap: var(--e3);
+  align-items: baseline;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  color: var(--tec-azul);
+  font-weight: 560;
+}
+
+.marca {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  transform: translateY(1px);
+}
+
+.marca-encontrado {
+  background: var(--bjff-rojo);
+}
+
+.marca-vecino {
+  background: #c6eeef;
+  box-shadow: inset 0 0 0 2.5px var(--tec-turquesa);
+}
+
+.resultado-nota {
+  margin-top: var(--e3);
+  font-size: 0.9375rem;
+}
+
+/* El anaquel: dibujo del mueble con el anaquel marcado. */
+.anaquel {
+  display: flex;
+  gap: var(--e4);
+  align-items: center;
+  margin-top: var(--e5);
+}
+
+.anaquel p {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.anaquel strong {
+  font-size: var(--t2);
+  font-stretch: 110%;
+  font-weight: 780;
+  color: var(--tec-azul);
+}
+
+.anaquel span {
+  font-size: 0.9375rem;
+}
+
+.mueble {
+  flex: none;
+}
+
+.mueble-marco {
+  fill: none;
+  stroke: var(--tec-azul);
+  stroke-width: 2;
+}
+
+.mueble-anaquel {
+  fill: var(--linea-suave);
+}
+
+.mueble-anaquel-buscado {
+  fill: var(--bjff-rojo);
+}
+
+.anaquel-vecino .mueble-anaquel-buscado {
+  fill: var(--tec-turquesa);
+}
+
+/* Aviso: búsqueda no disponible */
+.aviso {
+  padding: var(--e4);
+  background: var(--fondo);
+  border-left: 3px solid var(--tec-azul);
+}
+
+.aviso-titulo {
+  font-weight: 700;
+  color: var(--tec-azul);
+}
+
+/* Ejemplos del prototipo */
+.ejemplos {
+  margin-top: var(--e6);
+}
+
+.ejemplos-titulo {
+  margin-bottom: var(--e2);
+  font-size: var(--t-1);
+  color: var(--tinta-suave);
+}
+
+.ejemplos ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ejemplo {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--e4);
+  width: 100%;
+  padding: var(--e2) 0;
+  border: 0;
+  border-bottom: 1px solid var(--linea-suave);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ejemplo:hover .ejemplo-codigo {
+  text-decoration: underline;
+}
+
+.ejemplo-codigo {
+  font-variant-numeric: tabular-nums;
+  font-weight: 560;
+  color: var(--tec-azul);
+}
+
+.ejemplo-descripcion {
+  font-size: 0.9375rem;
+  color: var(--tinta-suave);
+}
+
+/* =========================================================
+   Celular: el panel es una hoja inferior y el plano queda arriba.
+   ========================================================= */
+@media (max-width: 719px) {
+  .panel {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: 62%;
+    padding: var(--e5) var(--e4) var(--e4);
+    border-radius: 0;
+    box-shadow: 0 -6px 20px rgb(0 40 85 / 0.16);
+  }
+
+  .panel-titulo {
+    font-size: var(--t2);
+    margin-bottom: var(--e4);
+  }
+
+  /* Con un resultado, el título ya cumplió su función: se oculta para que
+     la respuesta quede a la vista. */
+  .con-resultado .panel-titulo {
+    display: none;
+  }
+
+  .con-resultado .resultado {
+    margin-top: var(--e4);
+    padding-top: var(--e4);
+  }
+}
