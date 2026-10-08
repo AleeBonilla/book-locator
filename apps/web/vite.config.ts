@@ -7,10 +7,11 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // Prototipo: usa el normalizador de la API para validar códigos y armar
-      // la etiqueta de lomo. Al conectar con el backend pasará a un paquete
-      // compartido.
+      // Prototipo: usa el normalizador de la API para validar códigos. Al
+      // conectar con el backend pasará a un paquete compartido.
       '@classification': fileURLToPath(new URL('../api/src/classification', import.meta.url)),
+      // Prototipo del panel: reglas puras del backend (estado del esquema).
+      '@api': fileURLToPath(new URL('../api/src', import.meta.url)),
     },
   },
   server: {

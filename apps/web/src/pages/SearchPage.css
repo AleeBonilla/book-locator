@@ -51,45 +51,18 @@
   gap: var(--e2);
 }
 
-.campo {
+.formulario-fila .campo {
   flex: 1;
-  min-width: 0;
   height: 48px;
-  padding: 0 var(--e3);
-  border: 1px solid var(--linea);
-  border-radius: var(--radio);
-  background: var(--superficie);
   font-size: 1.125rem;
-  font-variant-numeric: tabular-nums;
 }
 
-.campo::placeholder {
-  color: #9aa0a6;
-}
-
-.campo-error {
-  border-color: var(--error);
-  box-shadow: inset 0 0 0 1px var(--error);
-}
-
-.boton-principal {
+.formulario-fila .boton-principal {
   height: 48px;
-  padding: 0 var(--e5);
-  border: 0;
-  border-radius: var(--radio);
-  background: var(--tec-azul);
-  color: #fff;
-  font-weight: 640;
-  cursor: pointer;
-}
-
-.boton-principal:hover {
-  background: var(--tec-azul-claro);
 }
 
 .boton-principal:disabled {
   cursor: progress;
-  opacity: 0.8;
 }
 
 .campo-ayuda,

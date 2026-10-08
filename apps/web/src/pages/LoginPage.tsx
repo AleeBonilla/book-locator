@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import edificio from '../assets/bjff-edificio.webp';
 import './LoginPage.css';
 
-type Status = 'idle' | 'loading' | 'rejected' | 'accepted';
+type Status = 'idle' | 'loading' | 'rejected';
 
 // Prototipo: no llama a la API. «demo» / «demo» muestra el ingreso correcto y
 // cualquier otro par, el rechazo.
@@ -16,6 +16,7 @@ export function LoginPage() {
   const [visible, setVisible] = useState(false);
   const [touched, setTouched] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
+  const navigate = useNavigate();
 
   const missingIdentifier = touched && !identifier.trim();
   const missingPassword = touched && !password;
@@ -25,7 +26,11 @@ export function LoginPage() {
     setTouched(true);
     if (!identifier.trim() || !password) return;
     setStatus('loading');
-    setStatus((await fakeLogin(identifier.trim(), password)) ? 'accepted' : 'rejected');
+    if (await fakeLogin(identifier.trim(), password)) {
+      navigate('/admin');
+    } else {
+      setStatus('rejected');
+    }
   };
 
   return (
@@ -43,12 +48,6 @@ export function LoginPage() {
           </p>
           <h1 className="titulo acceso-titulo">Iniciar sesión</h1>
 
-          {status === 'accepted' ? (
-            <div className="acceso-listo" role="status">
-              <p>Sesión iniciada.</p>
-              <p>El panel de administración llega en la próxima entrega del prototipo.</p>
-            </div>
-          ) : (
             <form className="acceso-formulario" onSubmit={submit} noValidate>
               {status === 'rejected' && (
                 <p className="acceso-rechazo" role="alert">
@@ -122,7 +121,6 @@ export function LoginPage() {
                 {status === 'loading' ? 'Iniciando sesión…' : 'Iniciar sesión'}
               </button>
             </form>
-          )}
 
           <Link to="/" className="acceso-volver">
             Volver a la búsqueda

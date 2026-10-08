@@ -156,3 +156,16 @@
     transform: translateY(0);
   }
 }
+
+/* Ubicación elegida en el panel de administración: turquesa (el rojo queda
+   para la búsqueda pública). */
+.lienzo .figura-seleccionada {
+  fill: var(--tec-turquesa);
+  stroke: #fff;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+
+.lienzo-flecha-seleccionada path {
+  fill: var(--tec-azul);
+}

@@ -30,10 +30,13 @@ export interface SearchResponse {
 export class ApiError extends Error {
   readonly status: number;
   readonly details?: { path: string; message: string }[];
+  // Detalle con otra forma, p. ej. el reporte del plano en un 422.
+  readonly extra?: unknown;
 
-  constructor(status: number, message: string, details?: { path: string; message: string }[]) {
+  constructor(status: number, message: string, details?: { path: string; message: string }[], extra?: unknown) {
     super(message);
     this.status = status;
     this.details = details;
+    this.extra = extra;
   }
 }
