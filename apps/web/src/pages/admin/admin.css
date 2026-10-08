@@ -32,6 +32,21 @@
   text-decoration: underline;
 }
 
+/* Cerrar sesión es una acción (POST /auth/logout), no un enlace, aunque se vea
+   igual que los vínculos de la barra. */
+.admin-salir {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.admin-salir:hover {
+  text-decoration: underline;
+}
+
 .admin-usuario {
   color: rgb(255 255 255 / 0.85);
 }

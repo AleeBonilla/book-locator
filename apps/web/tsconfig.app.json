@@ -5,7 +5,7 @@
     "lib": ["ES2023", "DOM"],
     "module": "esnext",
     "types": ["vite/client"],
-    "paths": { "@classification/*": ["../api/src/classification/*"], "@api/*": ["../api/src/*"] },
+    "customConditions": ["source"],
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
 

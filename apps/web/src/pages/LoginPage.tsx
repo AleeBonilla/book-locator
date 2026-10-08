@@ -1,14 +1,11 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import edificio from '../assets/bjff-edificio.webp';
+import { ApiError } from '../lib/api-types.ts';
+import { login } from '../lib/auth.ts';
 import './LoginPage.css';
 
-type Status = 'idle' | 'loading' | 'rejected';
-
-// Prototipo: no llama a la API. «demo» / «demo» muestra el ingreso correcto y
-// cualquier otro par, el rechazo.
-const fakeLogin = (identifier: string, password: string) =>
-  new Promise<boolean>((resolve) => setTimeout(() => resolve(identifier === 'demo' && password === 'demo'), 600));
+type Status = 'idle' | 'loading' | 'rejected' | 'failed';
 
 export function LoginPage() {
   const [identifier, setIdentifier] = useState('');
@@ -16,7 +13,10 @@ export function LoginPage() {
   const [visible, setVisible] = useState(false);
   const [touched, setTouched] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
+  const [failure, setFailure] = useState('');
   const navigate = useNavigate();
+  // Si se llegó aquí desde una página del panel sin sesión, se vuelve a ella.
+  const from = (useLocation().state as { from?: string } | null)?.from ?? '/admin';
 
   const missingIdentifier = touched && !identifier.trim();
   const missingPassword = touched && !password;
@@ -26,10 +26,17 @@ export function LoginPage() {
     setTouched(true);
     if (!identifier.trim() || !password) return;
     setStatus('loading');
-    if (await fakeLogin(identifier.trim(), password)) {
-      navigate('/admin');
-    } else {
-      setStatus('rejected');
+    try {
+      await login(identifier.trim(), password);
+      navigate(from, { replace: true });
+    } catch (caught) {
+      // 401: la API no dice si falló el usuario o la contraseña, a propósito.
+      if (caught instanceof ApiError && caught.status === 401) {
+        setStatus('rejected');
+      } else {
+        setFailure(caught instanceof ApiError ? caught.message : 'No se pudo iniciar sesión.');
+        setStatus('failed');
+      }
     }
   };
 
@@ -52,6 +59,11 @@ export function LoginPage() {
               {status === 'rejected' && (
                 <p className="acceso-rechazo" role="alert">
                   El usuario o la contraseña no son correctos.
+                </p>
+              )}
+              {status === 'failed' && (
+                <p className="acceso-rechazo" role="alert">
+                  {failure}
                 </p>
               )}
 
@@ -127,8 +139,6 @@ export function LoginPage() {
           </Link>
         </div>
       </div>
-
-      <p className="acceso-prototipo">Prototipo sin conexión: use demo / demo para ver el ingreso correcto.</p>
     </main>
   );
 }

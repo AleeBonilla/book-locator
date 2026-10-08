@@ -1,6 +1,5 @@
-// Tipos de las respuestas del backend (docs/api.md, decisión 0007). El
-// prototipo los reproduce para que conectar la API real no cambie las
-// pantallas.
+// Tipos de las respuestas de la búsqueda pública (docs/api.md, decisión 0007)
+// y del error común de la API.
 
 export interface PathStep {
   location_id: number;

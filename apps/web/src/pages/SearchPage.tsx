@@ -4,7 +4,7 @@ import { MapCanvas, type Insets, type MapHighlight } from '../components/MapCanv
 import { SearchResults } from '../components/SearchResults.tsx';
 import { SiteHeader } from '../components/SiteHeader.tsx';
 import { ApiError, type SearchResponse } from '../lib/api-types.ts';
-import { fetchMap, search } from '../lib/mock-api.ts';
+import { fetchMap, search } from '../lib/search.ts';
 import { sanitizeMap } from '../lib/sanitize-map.ts';
 import './SearchPage.css';
 
@@ -19,15 +19,6 @@ type SearchState =
 type Answer = SearchState & { request: string };
 
 type MapState = { status: 'loading' } | { status: 'ready'; svg: string } | { status: 'unavailable' };
-
-// Códigos para revisar cada estado del diseño en el prototipo.
-const EJEMPLOS = [
-  { code: '001.42 H557m4', label: 'un anaquel' },
-  { code: '658.8 K87m14', label: 'dos anaqueles' },
-  { code: '863 M378a', label: 'rango por mueble' },
-  { code: '720 B12', label: 'entre dos muebles' },
-  { code: '004.0195-236-i^2', label: 'mal escrita' },
-];
 
 export function SearchPage() {
   const [params, setParams] = useSearchParams();
@@ -125,12 +116,6 @@ export function SearchPage() {
     setParams(next);
   };
 
-  const showExample = (example: string) => {
-    const next = new URLSearchParams(params);
-    next.set('codigo', example);
-    setParams(next);
-  };
-
   const response = state.status === 'done' ? state.response : null;
   const highlights = useMemo<MapHighlight[]>(() => {
     if (!response) return [];
@@ -202,22 +187,6 @@ export function SearchPage() {
           <div aria-live="polite">
             {state.status === 'done' && <SearchResults response={state.response} />}
           </div>
-
-          {state.status === 'idle' && (
-            <div className="ejemplos">
-              <p className="ejemplos-titulo">Ejemplos para revisar el diseño</p>
-              <ul>
-                {EJEMPLOS.map((example) => (
-                  <li key={example.code}>
-                    <button type="button" className="ejemplo" onClick={() => showExample(example.code)}>
-                      <span className="ejemplo-codigo">{example.code}</span>
-                      <span className="ejemplo-descripcion">{example.label}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </main>
     </div>

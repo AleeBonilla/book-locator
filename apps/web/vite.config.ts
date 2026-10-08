@@ -1,22 +1,24 @@
-import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defaultClientConditions, defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: {
-      // Prototipo: usa el normalizador de la API para validar códigos. Al
-      // conectar con el backend pasará a un paquete compartido.
-      '@classification': fileURLToPath(new URL('../api/src/classification', import.meta.url)),
-      // Prototipo del panel: reglas puras del backend (estado del esquema).
-      '@api': fileURLToPath(new URL('../api/src', import.meta.url)),
-    },
+    // Los paquetes del repositorio (@bjff/classification) se usan desde su
+    // código fuente, sin compilarlos antes.
+    conditions: ['source', ...defaultClientConditions],
   },
   server: {
-    // Permite leer el parser y el plano de ejemplo que viven en apps/api.
-    fs: { allow: ['..'] },
+    // La web llama a la API en /api (lib/http.ts): mismo origen, así la cookie
+    // de sesión viaja sin CORS. Vite reenvía esas peticiones a la API sin el
+    // prefijo.
+    proxy: {
+      '/api': {
+        target: process.env.API_URL ?? 'http://localhost:3000',
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
     // Desde WSL, los archivos del disco de Windows (/mnt/c/…) no avisan cuando
     // cambian: hay que revisarlos periódicamente para que Vite recargue.
     watch: { usePolling: process.cwd().startsWith('/mnt/') },

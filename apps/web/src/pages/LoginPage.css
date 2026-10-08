@@ -175,12 +175,6 @@
   font-size: 0.9375rem;
 }
 
-.acceso-prototipo {
-  margin-top: var(--e4);
-  font-size: var(--t-1);
-  color: var(--tinta-suave);
-}
-
 @media (max-width: 479px) {
   .acceso {
     justify-content: flex-start;
@@ -199,10 +193,6 @@
 
   .acceso-titulo {
     font-size: var(--t3);
-  }
-
-  .acceso-prototipo {
-    padding: 0 var(--e5) var(--e5);
   }
 }
 
