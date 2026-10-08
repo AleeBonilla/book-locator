@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { AddLocationForm, LocationPanel } from '../../components/admin/LocationPanel.tsx';
+import { RangePanel, StructurePanel } from '../../components/admin/LocationPanel.tsx';
 import { LocationTree } from '../../components/admin/LocationTree.tsx';
 import { MapTab } from '../../components/admin/MapTab.tsx';
+import { PublishPanel } from '../../components/admin/PublishPanel.tsx';
 import { SchemeSteps } from '../../components/admin/SchemeSteps.tsx';
-import { stepsFor, type Tab } from '../../lib/admin-steps.ts';
+import { AddLocationsForm, StructureBuilder, StructureSummary } from '../../components/admin/StructureBuilder.tsx';
+import { renameLevel, templateInside, templateOf } from '../../lib/structure.ts';
+import { firstPending, stepsFor, type Tab } from '../../lib/admin-steps.ts';
 import { statusText } from '../../lib/admin-format.ts';
 import type { LocationNode, MapReport, SchemeDetail } from '../../lib/admin-types.ts';
 import { ApiError } from '../../lib/api-types.ts';
@@ -30,7 +33,8 @@ export function SchemePage() {
   const navigate = useNavigate();
   const [scheme, setScheme] = useState<SchemeDetail | null>(null);
   const [mapReport, setMapReport] = useState<MapReport | null>(null);
-  const [tab, setTab] = useState<Tab>('ubicaciones');
+  // null hasta que carga el esquema.
+  const [tab, setTab] = useState<Tab | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +54,9 @@ export function SchemePage() {
         if (!current) return;
         setScheme(detail);
         setMapReport(report);
+        // Abre en el primer paso sin terminar y se queda ahí aunque el paso
+        // se complete (crear la estructura no salta solo a Rangos).
+        setTab((open) => open ?? firstPending(stepsFor(detail, report)));
       },
       () => current && setError('No existe ese esquema.'),
     );
@@ -84,6 +91,7 @@ export function SchemePage() {
     const entry = index.get(id);
     if (!entry) return;
     setSelectedId(id);
+    setAddingRoot(false);
     setExpanded((current) => new Set([...current, ...entry.ancestors]));
   };
 
@@ -96,17 +104,50 @@ export function SchemePage() {
   }
 
   const editable = !scheme.published_at;
-  const structureLocked = [...index.values()].some((entry) => entry.node.range);
+  const hasRanges = [...index.values()].some((entry) => entry.node.range);
+  const structureEditable = editable && !hasRanges;
   const steps = stepsFor(scheme, mapReport);
-  const ready = scheme.status === 'ASSIGNED' && Boolean(mapReport?.publishable);
+  const current = tab ?? firstPending(steps);
+  const structure = templateOf(scheme.locations);
+  const path = selected ? selected.ancestors.map((id) => index.get(id)!.node) : [];
+  const pathNames = path.map((node) => node.name);
+  // Lo que la estructura prevé dentro de la ubicación elegida, según los
+  // niveles de su ruta.
+  const inside = selected ? templateInside(structure, [...path.map((node) => node.level_name), selected.node.level_name]) : [];
   const levelNames = [...new Set([...index.values()].map((entry) => entry.node.level_name))];
   const requiredLevels = new Set([...index.values()].filter((e) => e.node.range_required).map((e) => e.node.level_name));
   const minimum = requiredLevels.size === 1 ? [...requiredLevels][0] : requiredLevels.size === 0 ? '' : 'varios';
 
+  const go = (nextTab: Tab, focusCode?: string) => {
+    setTab(nextTab);
+    setAddingRoot(false);
+    const entry = focusCode ? byCode.get(focusCode) : undefined;
+    if (entry) select(entry.node.location_id);
+  };
+
   const copy = async () => {
     const copySaved = await api.copyScheme(schemeId);
+    setTab(null);
     navigate(`/admin/esquemas/${copySaved.scheme_id}`);
   };
+
+  const tree = (showRanges: boolean) => (
+    <LocationTree
+      nodes={scheme.locations}
+      selectedId={selectedId}
+      expanded={expanded}
+      showRanges={showRanges}
+      onToggle={(id) =>
+        setExpanded((current) => {
+          const next = new Set(current);
+          if (next.has(id)) next.delete(id);
+          else next.add(id);
+          return next;
+        })
+      }
+      onSelect={(node) => select(node.location_id)}
+    />
+  );
 
   return (
     <main className="admin-pagina admin-esquema">
@@ -116,55 +157,24 @@ export function SchemePage() {
         <span>{scheme.name}</span>
       </nav>
 
-      <div className="admin-cabecera">
-        <div>
-          <h1 className="titulo admin-titulo">{scheme.name}</h1>
-          <p className="esquema-resumen">{statusText(scheme)}</p>
-          {scheme.short_description && <p className="esquema-descripcion">{scheme.short_description}</p>}
-        </div>
-        <div className="esquema-acciones-principales">
-          {!scheme.published_at && (
-            <>
-              {!ready && <span className="acciones-nota">Complete los pasos para publicar</span>}
-              <button type="button" className="boton-principal" disabled={!ready} onClick={() => void run(() => api.publishScheme(schemeId).then(() => undefined))}>
-                Publicar
-              </button>
-            </>
-          )}
-          {scheme.published_at && !scheme.is_active && (
-            <>
-              <button type="button" className="boton-secundario" onClick={() => void run(() => api.unpublishScheme(schemeId).then(() => undefined))}>
-                Despublicar
-              </button>
-              <button type="button" className="boton-principal" onClick={() => activateDialog.current?.showModal()}>
-                Activar
-              </button>
-            </>
-          )}
-          {scheme.published_at && (
-            <button type="button" className="boton-secundario" onClick={() => void copy()}>
-              Copiar para editar
-            </button>
-          )}
-        </div>
-      </div>
+      <header className="admin-cabecera">
+        <h1 className="titulo admin-titulo">{scheme.name}</h1>
+        <p className="esquema-resumen">{statusText(scheme)}</p>
+        {scheme.short_description && <p className="esquema-descripcion">{scheme.short_description}</p>}
+      </header>
 
       {scheme.published_at && (
         <p className="aviso-publicado" role="status">
           {scheme.is_active
-            ? 'Este esquema está en uso en la búsqueda pública y no se puede editar. Para hacer cambios, cópielo.'
-            : 'Este esquema está publicado y no se puede editar. Para hacer cambios, cópielo o despublíquelo.'}
+            ? 'Este esquema está en uso en la búsqueda pública y no se puede editar.'
+            : 'Este esquema está publicado y no se puede editar.'}{' '}
+          <button type="button" className="boton-texto" onClick={() => void copy()}>
+            Copiar para editar
+          </button>
         </p>
       )}
 
-      <SchemeSteps
-        steps={steps}
-        onGo={(nextTab, focusCode) => {
-          setTab(nextTab);
-          const entry = focusCode ? byCode.get(focusCode) : undefined;
-          if (entry) select(entry.node.location_id);
-        }}
-      />
+      <SchemeSteps steps={steps} current={current} onGo={go} />
 
       {error && (
         <p className="admin-error" role="alert">
@@ -175,113 +185,156 @@ export function SchemePage() {
         </p>
       )}
 
-      <div className="pestanas" role="tablist" aria-label="Secciones del esquema">
-        {(['ubicaciones', 'plano'] as const).map((name) => (
-          <button
-            key={name}
-            type="button"
-            role="tab"
-            aria-selected={tab === name}
-            className={tab === name ? 'pestana pestana-activa' : 'pestana'}
-            onClick={() => setTab(name)}
-          >
-            {name === 'ubicaciones' ? 'Ubicaciones y rangos' : 'Plano'}
-          </button>
-        ))}
-      </div>
+      <div className="seccion" role="tabpanel">
+        {current === 'estructura' &&
+          (scheme.locations.length === 0 ? (
+            editable ? (
+              <StructureBuilder onCreate={async (items) => void (await run(() => api.createLocations(schemeId, null, items)))} />
+            ) : (
+              <p className="detalle-vacio">Este esquema no tiene ubicaciones.</p>
+            )
+          ) : (
+            <>
+              {editable && hasRanges && (
+                <p className="seccion-aviso">
+                  Mientras haya rangos asignados solo se pueden cambiar nombres. Para agregar, mover o eliminar ubicaciones,
+                  quite los rangos o trabaje sobre una copia.
+                </p>
+              )}
+              <div className="ubicaciones">
+                <div className="arbol-columna">
+                  {tree(false)}
+                  {structureEditable && (
+                    <button type="button" className="boton-secundario arbol-agregar" disabled={addingRoot} onClick={() => setAddingRoot(true)}>
+                      Agregar en la sala
+                    </button>
+                  )}
+                </div>
+                <div className="detalle-columna">
+                  {addingRoot ? (
+                    <AddLocationsForm
+                      parentName={null}
+                      existing={scheme.locations}
+                      options={structure}
+                      required={requiredLevels}
+                      onCancel={() => setAddingRoot(false)}
+                      onAdd={async (items) => {
+                        if (await run(() => api.createLocations(schemeId, null, items))) setAddingRoot(false);
+                      }}
+                    />
+                  ) : selected ? (
+                    <>
+                      <button type="button" className="boton-texto detalle-volver" onClick={() => setSelectedId(null)}>
+                        Ver la estructura completa
+                      </button>
+                      <StructurePanel
+                        key={selected.node.location_id}
+                        schemeId={schemeId}
+                        node={selected.node}
+                        path={pathNames}
+                        siblings={selected.siblings}
+                        editable={editable}
+                        structureEditable={structureEditable}
+                        options={inside}
+                        required={requiredLevels}
+                        run={run}
+                        onDeleted={() => setSelectedId(null)}
+                      />
+                    </>
+                  ) : (
+                    <StructureSummary
+                      template={structure}
+                      levels={levelNames}
+                      editable={editable}
+                      onRename={(changes) =>
+                        run(() =>
+                          api.updateLocations(
+                            schemeId,
+                            changes.flatMap(({ from, to }) => renameLevel(scheme.locations, from, to)),
+                          ),
+                        )
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+            </>
+          ))}
 
-      {tab === 'ubicaciones' ? (
-        <div className="ubicaciones">
-          <div className="arbol-columna">
-            <label className="minimo">
-              Mínimo para publicar
-              <select
-                value={minimum}
-                disabled={!editable}
-                onChange={(event) => void run(() => api.setMinimumLevel(schemeId, event.target.value))}
-              >
-                <option value="">Sin definir</option>
-                {minimum === 'varios' && <option value="varios">Varios niveles</option>}
-                {levelNames.map((name) => (
-                  <option key={name} value={name}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {scheme.locations.length > 0 ? (
-              <LocationTree
-                nodes={scheme.locations}
-                selectedId={selectedId}
-                expanded={expanded}
-                onToggle={(id) =>
-                  setExpanded((current) => {
-                    const next = new Set(current);
-                    if (next.has(id)) next.delete(id);
-                    else next.add(id);
-                    return next;
-                  })
-                }
-                onSelect={(node) => select(node.location_id)}
-              />
-            ) : (
-              <p className="arbol-vacio">Todavía no hay ubicaciones. Empiece por las de primer nivel, por ejemplo las filas.</p>
-            )}
-            {addingRoot ? (
-              <AddLocationForm
-                parent={null}
-                onCancel={() => setAddingRoot(false)}
-                onAdd={async (name, levelName) => {
-                  if (await run(() => api.createLocation(schemeId, { parent_location_id: null, name, level_name: levelName }))) {
-                    setAddingRoot(false);
-                  }
-                }}
-              />
-            ) : (
-              <button
-                type="button"
-                className="boton-secundario arbol-agregar"
-                disabled={!editable || structureLocked}
-                onClick={() => setAddingRoot(true)}
-              >
-                Agregar ubicación principal
+        {current === 'rangos' &&
+          (scheme.locations.length === 0 ? (
+            <p className="detalle-vacio">
+              Primero defina la estructura.{' '}
+              <button type="button" className="boton-texto" onClick={() => go('estructura')}>
+                Ir a Estructura
               </button>
-            )}
-          </div>
+            </p>
+          ) : (
+            <div className="ubicaciones">
+              <div className="arbol-columna">
+                <label className="minimo">
+                  Mínimo para publicar
+                  <select
+                    value={minimum}
+                    disabled={!editable}
+                    onChange={(event) => void run(() => api.setMinimumLevel(schemeId, event.target.value))}
+                  >
+                    <option value="">Sin definir</option>
+                    {minimum === 'varios' && <option value="varios">Varios niveles</option>}
+                    {levelNames.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {tree(true)}
+              </div>
+              <div className="detalle-columna">
+                {selected ? (
+                  <RangePanel
+                    key={selected.node.location_id}
+                    node={selected.node}
+                    path={pathNames}
+                    editable={editable}
+                    run={run}
+                    reload={reload}
+                  />
+                ) : (
+                  <p className="detalle-vacio">Elija una ubicación del árbol para cargar sus rangos.</p>
+                )}
+              </div>
+            </div>
+          ))}
 
-          <div className="detalle-columna">
-            {selected ? (
-              <LocationPanel
-                key={selected.node.location_id}
-                schemeId={schemeId}
-                node={selected.node}
-                siblings={selected.siblings}
-                editable={editable}
-                structureLocked={structureLocked}
-                run={run}
-                reload={reload}
-                onDeleted={() => setSelectedId(null)}
-              />
-            ) : (
-              <p className="detalle-vacio">Elija una ubicación del árbol para ver sus datos y cargar sus rangos.</p>
-            )}
-          </div>
-        </div>
-      ) : (
-        <MapTab
-          schemeId={schemeId}
-          schemeName={scheme.name}
-          report={mapReport}
-          editable={editable}
-          selectedCode={selected?.node.code ?? null}
-          onSelectCode={(code) => {
-            const entry = byCode.get(code);
-            if (entry) select(entry.node.location_id);
-            return Boolean(entry);
-          }}
-          run={run}
-        />
-      )}
+        {current === 'plano' && (
+          <MapTab
+            schemeId={schemeId}
+            schemeName={scheme.name}
+            report={mapReport}
+            editable={editable}
+            selectedCode={selected?.node.code ?? null}
+            onSelectCode={(code) => {
+              const entry = byCode.get(code);
+              if (entry) select(entry.node.location_id);
+              return Boolean(entry);
+            }}
+            run={run}
+          />
+        )}
+
+        {current === 'publicacion' && (
+          <PublishPanel
+            scheme={scheme}
+            steps={steps}
+            onGo={go}
+            onPublish={() => void run(() => api.publishScheme(schemeId).then(() => undefined))}
+            onActivate={() => activateDialog.current?.showModal()}
+            onUnpublish={() => void run(() => api.unpublishScheme(schemeId).then(() => undefined))}
+            onCopy={() => void copy()}
+          />
+        )}
+      </div>
 
       <dialog ref={activateDialog} className="dialogo" aria-labelledby="activar-titulo">
         <h2 id="activar-titulo">¿Activar «{scheme.name}»?</h2>

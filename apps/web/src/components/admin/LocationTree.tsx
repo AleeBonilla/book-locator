@@ -7,16 +7,25 @@ interface Props {
   expanded: Set<number>;
   onToggle: (id: number) => void;
   onSelect: (node: LocationNode) => void;
+  // Marca de rango del mínimo y «Faltan N» (sección Rangos).
+  showRanges: boolean;
 }
 
 // Árbol de ubicaciones con sus códigos. Las del mínimo de asignación llevan
 // una marca: con rango o sin rango.
 export function LocationTree(props: Props) {
-  // Al elegir una ubicación desde fuera del árbol (un paso, el plano), se
-  // desplaza hasta ella.
+  // Al elegir una ubicación desde fuera del árbol (un paso, el plano), la
+  // lista se desplaza hasta ella. Solo la lista: scrollIntoView movería
+  // también la página.
   const list = useRef<HTMLUListElement>(null);
   useEffect(() => {
-    list.current?.querySelector('.arbol-fila-elegida')?.scrollIntoView({ block: 'nearest' });
+    const container = list.current;
+    const row = container?.querySelector('.arbol-fila-elegida');
+    if (!container || !row) return;
+    const box = container.getBoundingClientRect();
+    const target = row.getBoundingClientRect();
+    if (target.top < box.top) container.scrollTop -= box.top - target.top;
+    else if (target.bottom > box.bottom) container.scrollTop += target.bottom - box.bottom;
   }, [props.selectedId]);
 
   return (
@@ -58,7 +67,7 @@ function TreeItem({ node, depth, ...props }: Props & { node: LocationNode; depth
         <button type="button" className="arbol-nombre" onClick={() => props.onSelect(node)}>
           <span>{node.name}</span>
           <span className="arbol-codigo">{node.code}</span>
-          {node.range_required ? (
+          {!props.showRanges ? null : node.range_required ? (
             <span className={node.range ? 'arbol-estado con-rango' : 'arbol-estado sin-rango'}>
               {node.range ? 'Con rango' : 'Sin rango'}
             </span>

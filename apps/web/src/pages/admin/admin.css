@@ -168,28 +168,34 @@
   color: var(--tinta-suave);
 }
 
+/* La cabecera del esquema solo identifica; las acciones están en cada paso. */
+.admin-esquema .admin-cabecera {
+  display: block;
+}
+
 .esquema-resumen {
-  margin-top: var(--e3);
+  margin-top: var(--e2);
   font-weight: 600;
   color: var(--tinta);
 }
 
-.esquema-acciones-principales {
-  display: flex;
-  gap: var(--e2);
-  align-items: center;
-}
-
-.acciones-nota {
-  font-size: var(--t-1);
-  color: var(--tinta-suave);
-}
-
 .aviso-publicado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e2) var(--e4);
+  align-items: baseline;
   margin-bottom: var(--e4);
   padding: var(--e3) var(--e4);
   border-left: 3px solid var(--tec-azul);
   background: var(--superficie);
+}
+
+.seccion-aviso {
+  margin-bottom: var(--e4);
+  padding: var(--e3) var(--e4);
+  border-left: 3px solid var(--tec-turquesa);
+  background: var(--superficie);
+  font-size: 0.9375rem;
 }
 
 /* Pasos para publicar: una secuencia real, por eso numerada. */
@@ -264,28 +270,24 @@
   color: var(--tinta-suave);
 }
 
-/* Pestañas */
-.pestanas {
-  display: flex;
-  gap: var(--e5);
-  margin-bottom: var(--e4);
-  border-bottom: 1px solid var(--linea-suave);
-}
-
-.pestana {
-  margin-bottom: -1px;
-  padding: var(--e2) 0 var(--e3);
-  border: 0;
+/* Los pasos son también las pestañas: el actual lleva la barra turquesa. */
+.paso button {
   border-bottom: 3px solid transparent;
-  background: none;
-  font-weight: 600;
-  color: var(--tinta-suave);
-  cursor: pointer;
 }
 
-.pestana-activa {
+.paso-actual button,
+.paso-actual button:hover {
   border-bottom-color: var(--tec-turquesa);
+  background: #f1fafa;
+}
+
+.paso-actual .paso-numero {
+  border-color: var(--tec-turquesa);
   color: var(--tec-azul);
+}
+
+.paso-actual.paso-hecho .paso-numero {
+  color: #fff;
 }
 
 /* =========================================================
@@ -441,8 +443,29 @@
 
 .ubicacion-cabecera {
   display: flex;
-  gap: var(--e3);
+  flex-wrap: wrap;
+  gap: var(--e1) var(--e3);
   align-items: baseline;
+}
+
+.ubicacion-ruta {
+  flex-basis: 100%;
+  font-size: var(--t-1);
+  color: var(--tinta-suave);
+}
+
+.detalle-volver {
+  margin-bottom: var(--e3);
+}
+
+.ubicacion-minimo {
+  margin: var(--e3) 0 var(--e4);
+}
+
+.ubicacion-acciones-estructura {
+  margin-top: var(--e5);
+  padding-top: var(--e4);
+  border-top: 1px solid var(--linea-suave);
 }
 
 .ubicacion-cabecera h2 {
@@ -629,6 +652,208 @@
 
 .agregar-acciones {
   margin-top: 0;
+}
+
+/* =========================================================
+   Estructura: niveles y alta en lote
+   ========================================================= */
+.estructura {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e4);
+  align-items: flex-start;
+  max-width: 880px;
+  padding: var(--e5);
+  background: var(--superficie);
+  border: 1px solid var(--linea-suave);
+}
+
+.estructura h2 {
+  font-size: var(--t2);
+  font-stretch: 110%;
+  font-weight: 780;
+  color: var(--tec-azul);
+}
+
+.estructura-ayuda {
+  line-height: 1.5;
+  color: var(--tinta-suave);
+}
+
+.tabla-niveles {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.tabla-niveles th {
+  padding: 0 var(--e3) var(--e2) 0;
+  font-size: var(--t-1);
+  font-weight: 600;
+  text-align: left;
+  color: var(--tinta-suave);
+}
+
+.tabla-niveles td {
+  padding: var(--e1) var(--e3) var(--e1) 0;
+}
+
+/* La sangría muestra qué contiene a qué; la línea la acompaña. */
+.nivel-nombre {
+  position: relative;
+  width: 45%;
+}
+
+.nivel-nombre .campo-tabla {
+  min-width: 160px;
+}
+
+.nivel-cantidad {
+  display: flex;
+  gap: var(--e2);
+  align-items: center;
+  white-space: nowrap;
+  color: var(--tinta-suave);
+}
+
+.campo-numero {
+  width: 76px;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.nivel-acciones {
+  white-space: nowrap;
+}
+
+.nivel-acciones .boton-texto + .boton-texto {
+  margin-left: var(--e3);
+}
+
+.estructura-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e3);
+  align-items: center;
+}
+
+.estructura-total {
+  color: var(--tinta-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.estructura-problema {
+  color: var(--error);
+  font-size: 0.875rem;
+}
+
+/* Tarjeta de la estructura (sección Estructura, sin ubicación elegida) */
+.estructura-tarjeta h2 {
+  font-size: var(--t2);
+  font-stretch: 110%;
+  font-weight: 780;
+  color: var(--tec-azul);
+}
+
+.estructura-tarjeta ul {
+  margin: 0;
+  padding-left: var(--e5);
+  list-style: none;
+}
+
+.estructura-tarjeta > ul {
+  margin: var(--e3) 0;
+  padding-left: 0;
+}
+
+.estructura-tarjeta li {
+  line-height: 1.7;
+}
+
+.renombrar-nivel {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 280px);
+  gap: var(--e3);
+  align-items: center;
+  color: var(--tinta-suave);
+}
+
+/* Publicación */
+.publicacion h2 {
+  margin-bottom: var(--e3);
+  font-size: var(--t2);
+  font-stretch: 110%;
+  font-weight: 780;
+  color: var(--tec-azul);
+}
+
+.publicacion p {
+  max-width: 68ch;
+  line-height: 1.5;
+}
+
+.publicacion-pendientes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.publicacion-pendientes li {
+  display: flex;
+  gap: var(--e4);
+  align-items: baseline;
+  justify-content: space-between;
+  max-width: 560px;
+  padding: var(--e2) 0;
+  border-top: 1px solid var(--linea-suave);
+}
+
+.publicacion-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e3);
+  margin-top: var(--e5);
+}
+
+.estructura-cantidad {
+  color: var(--tinta-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.estructura-renombrar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e2);
+  margin-top: var(--e2);
+}
+
+.estructura-renombrar .campo {
+  height: 36px;
+}
+
+/* Alta en lote dentro de una ubicación */
+.agregar-lote {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.agregar .agregar-partir {
+  flex-direction: row;
+  gap: var(--e3);
+  align-items: center;
+}
+
+.agregar-partir .campo {
+  width: auto;
+  height: 36px;
+}
+
+.agregar .campo-tabla {
+  font-weight: 400;
+}
+
+.agregar-lote .agregar-acciones {
+  align-items: center;
 }
 
 /* =========================================================
