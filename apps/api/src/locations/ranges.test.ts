@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { after, before, describe, it } from "node:test";
-import { normalizeClassification } from "../classification/normalize.js";
-import { classificationSortKey } from "../classification/sort-key.js";
+import { normalizeClassification } from "@bjff/classification";
+import { classificationSortKey } from "@bjff/classification/sort-key";
 import { pool } from "../db.js";
 import { skipWithoutDatabase, startTestApi, type TestApi } from "../test-support/api.js";
 

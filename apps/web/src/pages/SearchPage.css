@@ -188,51 +188,6 @@
   color: var(--tec-azul);
 }
 
-/* Ejemplos del prototipo */
-.ejemplos {
-  margin-top: var(--e6);
-}
-
-.ejemplos-titulo {
-  margin-bottom: var(--e2);
-  font-size: var(--t-1);
-  color: var(--tinta-suave);
-}
-
-.ejemplos ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ejemplo {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--e4);
-  width: 100%;
-  padding: var(--e2) 0;
-  border: 0;
-  border-bottom: 1px solid var(--linea-suave);
-  background: none;
-  text-align: left;
-  cursor: pointer;
-}
-
-.ejemplo:hover .ejemplo-codigo {
-  text-decoration: underline;
-}
-
-.ejemplo-codigo {
-  font-variant-numeric: tabular-nums;
-  font-weight: 560;
-  color: var(--tec-azul);
-}
-
-.ejemplo-descripcion {
-  font-size: 0.9375rem;
-  color: var(--tinta-suave);
-}
-
 /* =========================================================
    Celular: el panel es una hoja inferior y el plano queda arriba.
    ========================================================= */

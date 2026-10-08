@@ -1,7 +1,7 @@
 import { useState, type FocusEvent } from 'react';
 import { ApiError } from '../../lib/api-types.ts';
 import type { LocationNode } from '../../lib/admin-types.ts';
-import { validateCode } from '../../lib/mock-admin.ts';
+import { validateCode } from '../../lib/admin-api.ts';
 
 type Status = { kind: 'idle' } | { kind: 'saving' } | { kind: 'saved' } | { kind: 'error'; message: string };
 

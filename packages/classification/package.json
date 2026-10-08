@@ -1,0 +1,28 @@
+{
+  "name": "@bjff/classification",
+  "version": "1.0.0",
+  "description": "Normalización y ordenamiento de códigos de clasificación de la BJFF (docs/normalization.md, docs/sort-key.md)",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./sort-key": {
+      "source": "./src/sort-key.ts",
+      "types": "./dist/sort-key.d.ts",
+      "default": "./dist/sort-key.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --import tsx --test \"src/**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

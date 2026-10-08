@@ -24,7 +24,7 @@ cutter_cifras   cadena de dígitos, posiblemente vacía
 edicion         lista ordenada de segmentos, posiblemente vacía
 ```
 
-En la implementación (`apps/api/src/classification/normalize.ts`) los campos se llaman `prefix`, `ddc`, `cutterLetters`, `cutterDigits` y `edition`.
+En la implementación (`packages/classification/src/normalize.ts`) los campos se llaman `prefix`, `ddc`, `cutterLetters`, `cutterDigits` y `edition`.
 
 Los únicos estados son `válido` e `inválido`, definidos en la sección 5. El Cutter es opcional: cuando falta, `cutter_letras` y `cutter_cifras` son cadenas vacías y `edicion` es una lista vacía. Una edición requiere un Cutter.
 
@@ -274,7 +274,7 @@ La salida se presenta como `prefijo / ddc / cutter_letras / cutter_cifras / edic
 | `Cr863D633.o` | — | inválido |
 | `33.72M665g` | — | inválido |
 
-Estos casos se verifican en `apps/api/src/classification/normalize.test.ts`.
+Estos casos se verifican en `packages/classification/src/normalize.test.ts`.
 
 ## 8. Criterios de conformidad
 

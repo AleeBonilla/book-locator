@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import type { LocationNode } from '../../lib/admin-types.ts';
-import * as api from '../../lib/mock-admin.ts';
+import * as api from '../../lib/admin-api.ts';
 import { autoName, hasOwnName, positionAmong, renumber, type TemplateNode } from '../../lib/structure.ts';
 import { RangeRow } from './RangeRow.tsx';
 import { AddLocationsForm } from './StructureBuilder.tsx';
@@ -75,7 +75,7 @@ export function StructurePanel({
     const order = [...siblings];
     [order[index], order[index + direction]] = [order[index + direction], order[index]];
     void run(async () => {
-      await api.moveLocation(node.location_id, direction);
+      await api.moveLocation(node, direction);
       await api.updateLocations(schemeId, renumber(siblings, order));
     });
   };

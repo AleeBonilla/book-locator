@@ -1,5 +1,5 @@
-import { normalizeClassification } from "../classification/normalize.js";
-import { classificationSortKey } from "../classification/sort-key.js";
+import { normalizeClassification } from "@bjff/classification";
+import { classificationSortKey } from "@bjff/classification/sort-key";
 import { pool, withTransaction, type Queryable } from "../db.js";
 import { ConflictError, InvalidInputError } from "../errors.js";
 import type { ValidationIssue } from "../http/validate.js";

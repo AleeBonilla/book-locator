@@ -169,7 +169,7 @@ Historias principales implementadas en BJFF Book Locator, agrupadas por quién l
 - Cada código se normaliza y se convierte en una clave binaria (`BYTEA`) que PostgreSQL compara directamente.
 - `S248 < S25`, `q6 < q10`, `999 < A863`; la Ñ va entre la N y la O.
 
-*Documentación:* `docs/normalization.md`, `docs/classification-ordering.md`, `docs/sort-key.md`. *Backend:* `apps/api/src/classification`.
+*Documentación:* `docs/normalization.md`, `docs/classification-ordering.md`, `docs/sort-key.md`. *Código:* `packages/classification` (paquete `@bjff/classification`, compartido por la API y la web).
 
 ### 17. Mostrar planos sin riesgos
 

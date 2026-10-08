@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { downloadText } from '../../lib/admin-format.ts';
 import type { MapReport } from '../../lib/admin-types.ts';
 import { ApiError } from '../../lib/api-types.ts';
-import * as api from '../../lib/mock-admin.ts';
+import * as api from '../../lib/admin-api.ts';
 import { sanitizeMap } from '../../lib/sanitize-map.ts';
 import { MapCanvas, type MapHighlight } from '../MapCanvas.tsx';
 

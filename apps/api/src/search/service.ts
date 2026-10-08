@@ -1,5 +1,5 @@
-import { normalizeClassification } from "../classification/normalize.js";
-import { classificationSortKey } from "../classification/sort-key.js";
+import { normalizeClassification } from "@bjff/classification";
+import { classificationSortKey } from "@bjff/classification/sort-key";
 import { pool } from "../db.js";
 import { InvalidInputError, UnavailableError } from "../errors.js";
 import { compareCodes } from "../locations/codes.js";

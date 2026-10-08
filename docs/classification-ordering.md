@@ -194,7 +194,7 @@ Dos estructuras son equivalentes para el orden si ningún componente establece u
 | `97286O13c = 972.86 O13c` | Misma estructura tras normalización (DDC sin punto) |
 | `001.42H557m^4 = 001.42 H557m4` | Misma estructura tras normalización (superíndice) |
 
-Estos casos se verifican en `apps/api/src/classification/compare.test.ts`, tanto con la comparación directa como con la clave binaria de [`sort-key.md`](sort-key.md).
+Estos casos se verifican en `packages/classification/src/compare.test.ts`, tanto con la comparación directa como con la clave binaria de [`sort-key.md`](sort-key.md).
 
 ## 11. Implementación en la base de datos
 

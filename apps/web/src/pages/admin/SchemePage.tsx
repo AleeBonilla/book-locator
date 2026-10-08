@@ -11,7 +11,7 @@ import { firstPending, stepsFor, type Tab } from '../../lib/admin-steps.ts';
 import { statusText } from '../../lib/admin-format.ts';
 import type { LocationNode, MapReport, SchemeDetail } from '../../lib/admin-types.ts';
 import { ApiError } from '../../lib/api-types.ts';
-import * as api from '../../lib/mock-admin.ts';
+import * as api from '../../lib/admin-api.ts';
 
 interface Indexed {
   node: LocationNode;
@@ -277,7 +277,7 @@ export function SchemePage() {
                   <select
                     value={minimum}
                     disabled={!editable}
-                    onChange={(event) => void run(() => api.setMinimumLevel(schemeId, event.target.value))}
+                    onChange={(event) => void run(() => api.setMinimumLevel(schemeId, event.target.value, scheme.locations))}
                   >
                     <option value="">Sin definir</option>
                     {minimum === 'varios' && <option value="varios">Varios niveles</option>}
