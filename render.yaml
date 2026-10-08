@@ -1,0 +1,24 @@
+# Blueprint de Render (https://render.com/docs/blueprint-spec): la API.
+# La web va en Vercel (apps/web/vercel.json) y la base en Neon; ver
+# docs/despliegue.md.
+services:
+  - type: web
+    name: bjff-book-locator-api
+    runtime: node
+    plan: free
+    # --include=dev: con NODE_ENV=production npm omitiría TypeScript, que hace
+    # falta para compilar. El postinstall de la raíz compila
+    # @bjff/classification.
+    buildCommand: npm ci --include=dev && npm run build -w api
+    startCommand: node apps/api/dist/index.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "24"
+      # Cadena de conexión de Neon (con ?sslmode=require). Se carga a mano en
+      # el panel de Render: no va en el repositorio.
+      - key: DATABASE_URL
+        sync: false
