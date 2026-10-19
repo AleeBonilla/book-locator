@@ -90,7 +90,7 @@ Todos los comandos se ejecutan en la carpeta del repositorio. `DC` abrevia `dock
 | Tarea | Comando |
 |---|---|
 | Ver el estado | `DC ps` |
-| Ver los registros | `DC logs -f api` (o `web`, `postgres`, `migrate`) |
+| Ver los registros | `DC logs -f api` (o `web`, `postgres`, `migrate`). Se conservan hasta 30 MB por contenedor. |
 | Detener / volver a levantar | `DC down` / `DC up -d` (los datos se conservan en el volumen) |
 | Actualizar a una versión nueva | `git pull` y `DC up -d --build` (las migraciones nuevas se aplican solas) |
 | Respaldar la base | `DC exec -T postgres pg_dump -U bjff -Fc bjff_book_locator > respaldo.dump` |

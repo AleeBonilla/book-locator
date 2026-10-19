@@ -14,10 +14,19 @@ name: bjff-book-locator-prod
 x-database-url: &database-url
   DATABASE_URL: postgres://bjff:${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}@postgres:5432/bjff_book_locator
 
+# Docker guarda los registros de cada contenedor sin límite. Con esto conserva
+# a lo sumo tres archivos de 10 MB por contenedor y borra los más viejos.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
+    logging: *logging
     environment:
       POSTGRES_DB: bjff_book_locator
       POSTGRES_USER: bjff
@@ -38,6 +47,7 @@ services:
     pull_policy: never
     command: ["node", "apps/api/dist/scripts/migrate.js"]
     environment: *database-url
+    logging: *logging
     depends_on:
       postgres:
         condition: service_healthy
@@ -50,6 +60,7 @@ services:
     image: bjff-book-locator-api
     restart: unless-stopped
     environment: *database-url
+    logging: *logging
     # Sin `ports`: solo la web (nginx) le habla.
     depends_on:
       migrate:
@@ -67,6 +78,7 @@ services:
       target: web
     image: bjff-book-locator-web
     restart: unless-stopped
+    logging: *logging
     # WEB_PORT=8080 escucha en todas las interfaces; 127.0.0.1:8080, solo en
     # la propia máquina (detrás de un proxy inverso con HTTPS).
     ports:
