@@ -66,6 +66,7 @@ tbody tr:last-child td { border-bottom: none; }
 td.num { white-space: nowrap; }
 td, th { hyphens: manual; }
 td.mono { white-space: nowrap; font-size: 8.6pt; }
+.nota-celda { display: block; margin-top: 1mm; font: 8.8pt/1.35 Calibri, sans-serif; color: #5a5a5a; white-space: normal; }
 .cuadro.partible { break-inside: auto; }
 .cuadro .titulo { break-after: avoid; }
 
@@ -75,7 +76,6 @@ figure svg { display: block; width: 100%; height: auto; }
 code, .mono { font: 9pt Consolas, "Cascadia Mono", monospace; }
 pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8; border-left: 2.5px solid var(--azul); padding: 3mm 4mm; margin: 2mm 0 4mm; white-space: pre-wrap; text-align: left; break-inside: avoid; }
 
-.firma { margin-top: 10mm; font: 10.5pt/1.6 Calibri, sans-serif; text-align: left; }
 .anexo-intro { font-size: 10.5pt; }
 </style>
 </head>
@@ -88,8 +88,8 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
 
   <div class="centro">
     <p class="tipo">Informe técnico</p>
-    <h1>Especificaciones técnicas y requisitos de alojamiento del sistema BJFF Book Locator</h1>
-    <p class="sub">Información técnica sobre lo que necesita el localizador de libros de la Biblioteca José Figueres Ferrer para funcionar correctamente en un servidor institucional</p>
+    <h1>Especificaciones técnicas y propuesta de alojamiento del sistema BJFF Book Locator</h1>
+    <p class="sub">Funcionamiento, tecnologías y despliegue actual del localizador de libros de la Biblioteca José Figueres Ferrer, con una propuesta de alojamiento en la infraestructura institucional</p>
   </div>
 
   <dl class="datos">
@@ -110,12 +110,12 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
     <li data-ref="s2"><span class="t">2. Antecedentes y contexto del proyecto</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="s3"><span class="t">3. Línea de tiempo del proyecto</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="s4"><span class="t">4. Descripción del sistema</span><span class="p"></span><span class="n"></span></li>
-    <li data-ref="s5"><span class="t">5. Arquitectura y especificaciones técnicas</span><span class="p"></span><span class="n"></span></li>
-    <li data-ref="s6"><span class="t">6. Requisitos de alojamiento</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s5"><span class="t">5. Arquitectura, tecnologías y despliegue</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s6"><span class="t">6. Recursos estimados para la propuesta</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="s7"><span class="t">7. Seguridad y protección de datos</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="s8"><span class="t">8. Instalación, operación y mantenimiento</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="s9"><span class="t">9. Pruebas de rendimiento y capacidad</span><span class="p"></span><span class="n"></span></li>
-    <li data-ref="s10"><span class="t">10. Resumen de requisitos</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s10"><span class="t">10. Resumen de la propuesta</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="aA"><span class="t">Anexo A. Comandos de instalación y operación</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="aB"><span class="t">Anexo B. Ejemplo de configuración del proxy inverso</span><span class="p"></span><span class="n"></span></li>
   </ol>
@@ -124,11 +124,11 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
 <!-- ============================== 1 ============================== -->
 <h2 id="s1" class="nueva">1. Introducción</h2>
 
-<p>El presente informe responde a la consulta del Departamento de Administración de Tecnologías de Información y Comunicación (DATIC) sobre lo que necesita el sistema BJFF Book Locator para alojarse en la infraestructura del Instituto Tecnológico de Costa Rica. Su propósito es explicar las especificaciones técnicas del sistema y los recursos con los que debe contar el servidor para que funcione correctamente.</p>
+<p>El presente informe responde a la consulta del Departamento de Administración de Tecnologías de Información y Comunicación (DATIC) sobre los requerimientos del sistema BJFF Book Locator para alojarse en la infraestructura del Instituto Tecnológico de Costa Rica. Describe cómo funciona el sistema, las tecnologías que utiliza y cómo se despliega actualmente, y presenta una propuesta de alojamiento con los recursos estimados, como referencia para que el DATIC valore la opción más adecuada.</p>
 
 <p>BJFF Book Locator es una aplicación web que permite a las personas usuarias de la Biblioteca José Figueres Ferrer ubicar físicamente un libro dentro de la sala general, el espacio donde se encuentra la colección, a partir de su código de clasificación. El sistema muestra, sobre un plano de la sala, el mueble y el anaquel donde se encuentra el material. Además, ofrece al personal de la biblioteca un panel de administración para mantener actualizada esa información sin intervención de los desarrolladores.</p>
 
-<p>El documento se organiza de la siguiente manera. Las secciones 2 y 3 describen el origen del proyecto y su evolución. Las secciones 4 y 5 presentan el sistema y su arquitectura. Las secciones 6 a 9 detallan los requisitos de alojamiento, las medidas de seguridad, el modelo de operación propuesto y los resultados de las pruebas de rendimiento. La sección 10 resume los requisitos para que el sistema funcione correctamente. Los anexos contienen los comandos de instalación y un ejemplo de configuración del proxy inverso.</p>
+<p>El documento se organiza de la siguiente manera. Las secciones 2 y 3 describen el origen del proyecto y su evolución. Las secciones 4 y 5 presentan el sistema, su arquitectura, sus tecnologías, el despliegue actual y la propuesta de alojamiento. Las secciones 6 a 9 detallan los recursos estimados, las medidas de seguridad, la operación y los resultados de las pruebas de rendimiento. La sección 10 resume la propuesta. Los anexos contienen los comandos de instalación y un ejemplo de configuración del proxy inverso.</p>
 
 <!-- ============================== 2 ============================== -->
 <h2 id="s2">2. Antecedentes y contexto del proyecto</h2>
@@ -143,12 +143,12 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
 
 <h3>2.3 Continuidad y estado actual</h3>
 <p>Durante el I semestre de 2026 el proyecto continuó como parte de las horas estudiantiles de Alexander Bonilla Figueroa, con reuniones periódicas de seguimiento con la jefatura de la biblioteca. En el II semestre de 2026 se construyó la versión actual del sistema, que se presentó formalmente el miércoles 14 de octubre de 2026 ante las personas vinculadas al proyecto de señalización.</p>
-<p>En la actualidad existe una versión de demostración alojada en servicios gratuitos en la nube. Esos servicios suspenden la aplicación tras unos minutos sin uso, lo que provoca demoras de hasta un minuto en la primera consulta, y no ofrecen garantías de continuidad. Para el uso permanente del sistema se contempla alojarlo en la infraestructura institucional, con un dominio propio del TEC, respaldos periódicos y una operación estable que no dependa de la permanencia de los estudiantes que lo desarrollaron. En ese marco, el DATIC consultó qué necesita el sistema para alojarse, y este informe reúne esa información.</p>
+<p>Actualmente el sistema funciona como versión de demostración en servicios gratuitos en la nube (sección 5.1). Para su uso permanente se contempla alojarlo en la infraestructura institucional, con un dominio propio del TEC, respaldos periódicos y una operación estable que no dependa de la permanencia de los estudiantes que lo desarrollaron. En ese marco, el DATIC consultó qué requiere el sistema para alojarse, y este informe reúne esa información.</p>
 
 <!-- ============================== 3 ============================== -->
 <h2 id="s3">3. Línea de tiempo del proyecto</h2>
 
-<p>El desarrollo se dividió en tres etapas, una por semestre. Cada una partió de las lecciones de la anterior: el prototipo inicial validó la idea, la segunda etapa resolvió el ordenamiento de los códigos y definió el diseño a largo plazo, y la tercera construyó el sistema que hoy se propone poner en producción.</p>
+<p>El desarrollo se dividió en tres etapas, una por semestre. Cada una partió de las lecciones de la anterior: el prototipo inicial validó la idea, la segunda etapa resolvió el ordenamiento de los códigos y definió el diseño a largo plazo, y la tercera construyó el sistema actual.</p>
 
 <figure>
   <figcaption><b>Figura 1.</b> Línea de tiempo del proyecto BJFF Book Locator.</figcaption>
@@ -235,9 +235,16 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
 <p>Se trata de un servicio de apoyo y de criticidad baja. Si el sistema no estuviera disponible, las personas usuarias podrían localizar los libros como lo hacen actualmente, con la señalización física y la ayuda del personal. No procesa pagos ni datos académicos, y no se integra con otros sistemas institucionales.</p>
 
 <!-- ============================== 5 ============================== -->
-<h2 id="s5">5. Arquitectura y especificaciones técnicas</h2>
+<h2 id="s5">5. Arquitectura, tecnologías y despliegue</h2>
 
-<p>El sistema se compone de un sitio web, una interfaz de programación (API) y una base de datos relacional. Se distribuye en contenedores Docker, coordinados con Docker Compose, que se construyen en el propio servidor a partir del código fuente. Esta forma de entrega reduce los requisitos del servidor a Docker y hace que la instalación sea idéntica en cualquier distribución de Linux.</p>
+<p>El sistema se compone de tres piezas: un sitio web, que es lo que ven el público y el personal; una interfaz de programación (API), que contiene la lógica; y una base de datos relacional, que guarda la configuración de la sala y las cuentas del personal.</p>
+
+<h3>5.1 Despliegue actual</h3>
+<p>La versión de demostración funciona en tres servicios en la nube con planes gratuitos: el sitio web en Vercel, la API en Render y la base de datos PostgreSQL en Neon. Es una opción sin costo, pero con limitaciones para el uso permanente: la API se suspende tras unos 15 minutos sin uso, de modo que la primera consulta posterior puede tardar hasta un minuto, y los planes gratuitos no ofrecen garantías de continuidad ni respaldos.</p>
+<p>Además, el proyecto incluye una configuración en contenedores Docker, probada de punta a punta, que permite instalar el sistema completo en un servidor propio. Esa configuración es la base de la propuesta que se describe a continuación.</p>
+
+<h3>5.2 Propuesta de alojamiento</h3>
+<p>Como posibilidad para la infraestructura institucional, el sistema se instalaría en una máquina virtual Linux, distribuido en contenedores Docker coordinados con Docker Compose y detrás de un proxy inverso con HTTPS (Figura 2). Con esta forma de entrega, al servidor solo se le pide Docker, y la instalación es idéntica en cualquier distribución de Linux.</p>
 
 <figure>
   <figcaption><b>Figura 2.</b> Arquitectura de despliegue propuesta.</figcaption>
@@ -254,10 +261,10 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
     <text x="43" y="130" text-anchor="middle" font-size="9.5" fill="#5a5a5a">público y personal</text>
     <line x1="84" y1="117" x2="110" y2="117" stroke="#333" stroke-width="1.2" marker-end="url(#f)"/>
     <text x="98" y="108" text-anchor="middle" font-size="9" fill="#333">HTTPS</text>
-    <!-- Proxy DATIC -->
+    <!-- Proxy inverso -->
     <rect x="112" y="92" width="94" height="50" rx="4" fill="#ffffff" stroke="#5a5a5a"/>
     <text x="159" y="114" text-anchor="middle" font-size="12" font-weight="600">Proxy inverso</text>
-    <text x="159" y="130" text-anchor="middle" font-size="10" fill="#5a5a5a">DATIC · certificado</text>
+    <text x="159" y="130" text-anchor="middle" font-size="10" fill="#5a5a5a">certificado HTTPS</text>
     <line x1="206" y1="117" x2="256" y2="117" stroke="#333" stroke-width="1.2" marker-end="url(#f)"/>
     <text x="224" y="109" text-anchor="middle" font-size="9.5" fill="#333">HTTP</text>
     <!-- web -->
@@ -305,6 +312,7 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
   </table>
 </div>
 
+<h3>5.3 Tecnologías</h3>
 <div class="cuadro">
   <p class="titulo"><b>Cuadro 3.</b> Tecnologías empleadas.</p>
   <table>
@@ -323,32 +331,32 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
 <p>El sitio y la API comparten un mismo origen: la API responde bajo la ruta /api del mismo dominio. Gracias a ello la sesión del personal funciona sin configuraciones adicionales entre dominios. Como consecuencia, el sistema debe ocupar la raíz de un dominio o subdominio y no puede publicarse dentro de una subcarpeta de otro sitio.</p>
 
 <!-- ============================== 6 ============================== -->
-<h2 id="s6">6. Requisitos de alojamiento</h2>
+<h2 id="s6">6. Recursos estimados para la propuesta</h2>
 
 <h3>6.1 Servidor</h3>
-<p>Se requiere una máquina virtual con los recursos del Cuadro 4. Los valores mínimos permiten el funcionamiento normal del sistema. Los recomendados dan holgura para construir las imágenes durante la instalación y las actualizaciones, que es el momento de mayor consumo.</p>
+<p>Para la propuesta descrita se estiman los recursos del Cuadro 4, con base en las mediciones de la sección 9. Los valores mínimos permiten el funcionamiento normal del sistema. Los recomendados dan holgura para construir las imágenes durante la instalación y las actualizaciones, que es el momento de mayor consumo.</p>
 
 <div class="cuadro">
-  <p class="titulo"><b>Cuadro 4.</b> Recursos de hardware.</p>
+  <p class="titulo"><b>Cuadro 4.</b> Recursos de hardware estimados.</p>
   <table>
     <thead><tr><th style="width:14%">Recurso</th><th style="width:14%">Mínimo</th><th style="width:15%">Recomendado</th><th>Justificación</th></tr></thead>
     <tbody>
       <tr><td>Procesador</td><td>1 vCPU</td><td>2 vCPU</td><td>La API atiende las solicitudes con un núcleo; el segundo agiliza la construcción de las imágenes.</td></tr>
       <tr><td>Memoria</td><td>1 GB</td><td>2 GB</td><td>En operación, los contenedores consumen alrededor de 80 MB en reposo y menos de 200 MB bajo carga alta (sección 9).</td></tr>
-      <tr><td>Disco</td><td>10 GB</td><td>20 GB</td><td>Unos 2 GB para imágenes y caché de construcción, unos 10 MB para la base de datos y hasta 30 MB de registros por contenedor, más margen para el sistema operativo y los respaldos locales.</td></tr>
+      <tr><td>Disco</td><td>10 GB</td><td>20 GB</td><td>Hasta 2 GB para imágenes y caché de construcción (alrededor de 1 GB si se entregan ya construidas), unos 10 MB para la base de datos y hasta 30 MB de registros por contenedor, más margen para el sistema operativo y los respaldos locales.</td></tr>
     </tbody>
   </table>
 </div>
 
 <div class="cuadro">
-  <p class="titulo"><b>Cuadro 5.</b> Software requerido en el servidor.</p>
+  <p class="titulo"><b>Cuadro 5.</b> Software en el servidor.</p>
   <table>
     <thead><tr><th style="width:24%">Software</th><th style="width:26%">Versión</th><th>Observaciones</th></tr></thead>
     <tbody>
       <tr><td>Sistema operativo</td><td>Linux de 64 bits (x86-64)</td><td>Cualquier distribución con soporte para Docker.</td></tr>
       <tr><td>Docker Engine</td><td>24 o superior</td><td>Probado con la versión 29.8. El servicio debe iniciar junto con el sistema operativo.</td></tr>
       <tr><td>Docker Compose</td><td>Versión 2 (complemento docker compose)</td><td>Probado con la versión 5.5.</td></tr>
-      <tr><td>Git</td><td>Cualquier versión reciente</td><td>Para obtener y actualizar el código fuente.</td></tr>
+      <tr><td>Git</td><td>Cualquier versión reciente</td><td>Solo si las imágenes se construyen en el servidor, para obtener el código fuente.</td></tr>
     </tbody>
   </table>
   <p class="fuente">No es necesario instalar Node.js, PostgreSQL ni nginx en el servidor: se incluyen en los contenedores.</p>
@@ -356,15 +364,15 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
 
 <h3>6.2 Red, dominio y certificados</h3>
 <div class="cuadro partible">
-  <p class="titulo"><b>Cuadro 6.</b> Requisitos de red.</p>
+  <p class="titulo"><b>Cuadro 6.</b> Consideraciones de red.</p>
   <table>
-    <thead><tr><th style="width:24%">Aspecto</th><th>Requisito</th></tr></thead>
+    <thead><tr><th style="width:24%">Aspecto</th><th>Detalle</th></tr></thead>
     <tbody>
-      <tr><td>Dominio</td><td>Un subdominio institucional (por ejemplo, localizador.biblioteca.tec.ac.cr, a definir por el DATIC) que apunte a la raíz del sistema.</td></tr>
-      <tr><td>Certificado HTTPS</td><td>Indispensable para el personal: la cookie de sesión solo se transmite por HTTPS. La búsqueda pública funciona también sin él. Se propone que el certificado y la terminación TLS los gestione el proxy inverso del DATIC.</td></tr>
+      <tr><td>Dominio</td><td>Un subdominio (por ejemplo, localizador.biblioteca.tec.ac.cr; el nombre lo definiría el DATIC) que apunte a la raíz del sistema.</td></tr>
+      <tr><td>Certificado HTTPS</td><td>Necesario para el acceso del personal: la cookie de sesión solo se transmite por HTTPS. La búsqueda pública funciona también sin él. En la propuesta, el certificado y la terminación TLS quedarían en un proxy inverso delante del sistema.</td></tr>
       <tr><td>Puertos</td><td>Entrada por el puerto 443 del proxy, que reenvía al puerto 8080 del servidor. Si el proxy reside en la misma máquina, el sistema puede escuchar únicamente en la interfaz local (127.0.0.1). Ningún otro puerto se expone.</td></tr>
-      <tr><td>Tamaño de solicitudes</td><td>El proxy debe aceptar solicitudes de hasta 6 MB, porque el personal carga planos de la sala de hasta 5 MB.</td></tr>
-      <tr><td>Salida a internet</td><td>Solo durante la instalación y las actualizaciones: Docker Hub (imágenes base), registry.npmjs.org (dependencias) y GitHub (código fuente). En operación normal el sistema no establece conexiones salientes.</td></tr>
+      <tr><td>Tamaño de solicitudes</td><td>El proxy tendría que aceptar solicitudes de hasta 6 MB, porque el personal carga planos de la sala de hasta 5 MB.</td></tr>
+      <tr><td>Salida a internet</td><td>En operación normal el sistema no establece conexiones salientes. Si las imágenes se construyen en el servidor, este necesita acceso a Docker Hub, registry.npmjs.org y GitHub durante la instalación y las actualizaciones. Si se entregan ya construidas, no requiere salida a internet.</td></tr>
       <tr><td>Otros servicios</td><td>No requiere servidor de correo, servicios de terceros ni redes de distribución de contenido (CDN).</td></tr>
     </tbody>
   </table>
@@ -400,53 +408,52 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
   <li>La contraseña de la base de datos se define en un archivo de configuración del servidor (.env), que no forma parte del código fuente.</li>
 </ul>
 
-<h3>7.3 Recomendaciones al DATIC</h3>
+<h3>7.3 Consideraciones</h3>
 <ul>
-  <li>Limitar en el proxy inverso la cantidad de intentos de inicio de sesión por dirección IP, por ejemplo a diez por minuto en la ruta /api/auth/login, ya que el sistema aún no implementa ese control por sí mismo.</li>
-  <li>Reconstruir periódicamente las imágenes para incorporar los parches de seguridad de las imágenes base (Anexo A).</li>
-  <li>Tener en cuenta que todas las cuentas del personal poseen el mismo nivel de acceso al panel, pues el sistema no distingue roles.</li>
+  <li>El sistema aún no limita la cantidad de intentos de inicio de sesión por dirección IP. Ese control podría aplicarse en el proxy inverso, por ejemplo con diez intentos por minuto en la ruta /api/auth/login.</li>
+  <li>Las imágenes base reciben parches de seguridad, que se incorporan al reconstruir las imágenes del sistema (Anexo A).</li>
+  <li>Todas las cuentas del personal poseen el mismo nivel de acceso al panel, pues el sistema no distingue roles.</li>
 </ul>
 
 <!-- ============================== 8 ============================== -->
 <h2 id="s8">8. Instalación, operación y mantenimiento</h2>
 
 <h3>8.1 Procedimiento de instalación</h3>
-<p>La instalación consta de cuatro pasos, que el responsable técnico puede ejecutar con acceso al servidor. Los comandos correspondientes se detallan en el Anexo A.</p>
+<p>Las imágenes de los contenedores pueden construirse en el propio servidor, lo que requiere salida a internet durante la instalación y las actualizaciones, o construirse en otro equipo y entregarse en un único archivo comprimido de unos 200 MB, de modo que el servidor no necesite salida a internet ni el código fuente. En ambos casos la instalación sigue los mismos pasos, cuyos comandos se detallan en el Anexo A:</p>
 <ol>
-  <li>Obtener el código fuente del sistema en el servidor.</li>
+  <li>Obtener las imágenes, ya sea construyéndolas en el servidor o cargando el archivo entregado.</li>
   <li>Crear el archivo de configuración con la contraseña de la base de datos y el puerto de escucha.</li>
-  <li>Construir e iniciar los contenedores. La primera vez el proceso tarda algunos minutos, y la estructura de la base de datos se crea automáticamente.</li>
+  <li>Iniciar los contenedores. La estructura de la base de datos se crea automáticamente.</li>
   <li>Crear las cuentas del personal de la biblioteca y cargar la información inicial de la sala.</li>
 </ol>
 
-<h3>8.2 Distribución de responsabilidades</h3>
-<p>Se propone la siguiente distribución de tareas entre el DATIC y el responsable técnico del sistema.</p>
+<h3>8.2 Tareas de operación</h3>
+<p>El Cuadro 8 resume las tareas que implica mantener el sistema en funcionamiento. Su distribución se definiría en conjunto con el DATIC; la información de la sala la mantiene el personal de la biblioteca desde el panel.</p>
 
 <div class="cuadro">
-  <p class="titulo"><b>Cuadro 8.</b> Responsabilidades propuestas.</p>
+  <p class="titulo"><b>Cuadro 8.</b> Tareas de operación y frecuencia sugerida.</p>
   <table>
-    <thead><tr><th style="width:40%">Tarea</th><th style="width:18%">Responsable</th><th>Frecuencia</th></tr></thead>
+    <thead><tr><th style="width:62%">Tarea</th><th>Frecuencia sugerida</th></tr></thead>
     <tbody>
-      <tr><td>Aprovisionar la máquina virtual, Docker, el dominio y el certificado</td><td>DATIC</td><td>Una vez</td></tr>
-      <tr><td>Mantener el sistema operativo y Docker actualizados</td><td>DATIC</td><td>Según sus políticas</td></tr>
-      <tr><td>Respaldar la base de datos y almacenar los respaldos fuera del servidor</td><td>DATIC</td><td>Diaria</td></tr>
-      <tr><td>Instalar el sistema y crear las cuentas del personal</td><td>Responsable técnico</td><td>Una vez y cuando se requiera</td></tr>
-      <tr><td>Instalar nuevas versiones del sistema</td><td>Responsable técnico</td><td>Con cada versión</td></tr>
-      <tr><td>Reconstruir las imágenes con los parches de seguridad</td><td>Responsable técnico o DATIC</td><td>Mensual</td></tr>
-      <tr><td>Mantener la información de la sala, los rangos y los planos</td><td>Personal de la biblioteca</td><td>Cuando cambie la sala</td></tr>
+      <tr><td>Preparar la máquina virtual, Docker, el dominio y el certificado</td><td>Una vez</td></tr>
+      <tr><td>Instalar el sistema y crear las cuentas del personal</td><td>Una vez y cuando se requiera</td></tr>
+      <tr><td>Respaldar la base de datos y guardar los respaldos fuera del servidor</td><td>Diaria</td></tr>
+      <tr><td>Actualizar el sistema operativo y Docker</td><td>Según las políticas institucionales</td></tr>
+      <tr><td>Reconstruir las imágenes con los parches de seguridad</td><td>Mensual</td></tr>
+      <tr><td>Instalar nuevas versiones del sistema</td><td>Con cada versión</td></tr>
     </tbody>
   </table>
 </div>
 
 <h3>8.3 Respaldos y recuperación</h3>
-<p>Toda la información que no proviene del código fuente reside en la base de datos. Por lo tanto, un respaldo de la base basta para reconstruir el sistema completo en otro servidor. Con los datos actuales, un respaldo comprimido ocupa menos de 1 MB. Se recomienda una copia diaria, y otra adicional antes de cada actualización.</p>
+<p>Toda la información que no proviene del código fuente reside en la base de datos. Por lo tanto, un respaldo de la base basta para reconstruir el sistema completo en otro servidor. Con los datos actuales, un respaldo comprimido ocupa menos de 1 MB. Una copia diaria, más otra antes de cada actualización, sería suficiente.</p>
 
 <h3>8.4 Continuidad y monitoreo</h3>
 <p>Los contenedores se reinician automáticamente si fallan o si se reinicia el servidor. Las actualizaciones aplican por sí mismas los cambios pendientes en la estructura de la base de datos antes de iniciar la API. Los registros de cada contenedor se rotan automáticamente, con un máximo de 30 MB por contenedor.</p>
-<p>Para el monitoreo, la dirección /api/health responde con el código 200 cuando el sistema funciona y alcanza la base de datos, y con el código 503 cuando no la alcanza. Si el DATIC cuenta con un sistema de monitoreo, se sugiere consultarla cada uno a cinco minutos.</p>
+<p>Para el monitoreo, la dirección /api/health responde con el código 200 cuando el sistema funciona y alcanza la base de datos, y con el código 503 cuando no la alcanza. Un sistema de monitoreo podría consultarla cada uno a cinco minutos.</p>
 
-<h3>8.5 Base de datos administrada por el DATIC</h3>
-<p>Si el DATIC prefiere ofrecer un servidor PostgreSQL 16 propio en lugar del contenedor de base de datos, el sistema lo admite: basta con prescindir de ese contenedor y configurar la cadena de conexión. La estructura de la base se crea igualmente de forma automática.</p>
+<h3>8.5 Base de datos externa</h3>
+<p>El sistema también puede usar un servidor PostgreSQL 16 existente en lugar del contenedor de base de datos: basta con prescindir de ese contenedor y configurar la cadena de conexión. La estructura de la base se crea igualmente de forma automática.</p>
 
 <!-- ============================== 9 ============================== -->
 <h2 id="s9">9. Pruebas de rendimiento y capacidad</h2>
@@ -470,50 +477,49 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
   </table>
 </div>
 
-<p>La demanda esperada es de algunas decenas de personas usuarias simultáneas, muy inferior a la capacidad medida. El crecimiento de la base de datos también es reducido: cada nueva versión de la configuración de la sala añade alrededor de 2 MB. Con base en estos resultados, una máquina virtual con los recursos recomendados del Cuadro 4 atiende la demanda prevista con amplio margen.</p>
+<p>La demanda esperada es de algunas decenas de personas usuarias simultáneas, muy inferior a la capacidad medida. El crecimiento de la base de datos también es reducido: cada nueva versión de la configuración de la sala añade alrededor de 2 MB.</p>
 
 <!-- ============================== 10 ============================== -->
-<h2 id="s10">10. Resumen de requisitos</h2>
+<h2 id="s10">10. Resumen de la propuesta</h2>
 
-<p>En síntesis, para que el sistema funcione correctamente en la infraestructura institucional necesita lo siguiente:</p>
-<ol>
-  <li>Una máquina virtual Linux de 64 bits con 2 vCPU, 2 GB de memoria y 20 GB de disco (como mínimo, 1 vCPU, 1 GB y 10 GB).</li>
-  <li>Docker Engine y Docker Compose versión 2 instalados, con el servicio habilitado al inicio del sistema operativo.</li>
-  <li>Un subdominio que apunte a la raíz del sistema, con certificado HTTPS y un proxy inverso hacia el puerto del sistema que admita solicitudes de hasta 6 MB.</li>
-  <li>Salida a internet desde el servidor hacia Docker Hub, registry.npmjs.org y GitHub durante la instalación y las actualizaciones.</li>
-  <li>Acceso remoto por SSH para el responsable técnico del sistema, para la instalación y el mantenimiento.</li>
-  <li>Un respaldo diario de la base de datos, almacenado fuera del servidor.</li>
-</ol>
-<p>Como medidas complementarias se recomiendan la limitación de intentos de inicio de sesión por dirección IP en el proxy y el monitoreo de la dirección /api/health.</p>
-
-<p>Quedo a disposición para ampliar cualquier aspecto de este informe o aclarar las dudas que surjan durante la evaluación del alojamiento.</p>
-
-<div class="firma">
-  Alexander Bonilla Figueroa<br>
-  Responsable técnico del sistema BJFF Book Locator<br>
-  Biblioteca José Figueres Ferrer, Instituto Tecnológico de Costa Rica<br>
-  alebonilla@estudiantec.cr
-</div>
+<p>En síntesis, la propuesta consiste en alojar el sistema en contenedores Docker sobre una máquina virtual Linux, detrás de un proxy inverso con HTTPS. Para esa configuración se estima lo siguiente:</p>
+<ul>
+  <li>Una máquina virtual Linux de 64 bits con 2 vCPU, 2 GB de memoria y 20 GB de disco (como mínimo, 1 vCPU, 1 GB y 10 GB), con Docker Engine y Docker Compose versión 2.</li>
+  <li>Un subdominio que apunte a la raíz del sistema, con certificado HTTPS y un proxy inverso que admita solicitudes de hasta 6 MB.</li>
+  <li>Acceso remoto por SSH para la instalación y el mantenimiento.</li>
+  <li>Un respaldo diario de la base de datos, guardado fuera del servidor.</li>
+  <li>Salida a internet únicamente si las imágenes se construyen en el servidor.</li>
+</ul>
+<p>Esta propuesta es una referencia y puede adaptarse a la infraestructura y a las políticas del DATIC. Quedo a disposición para ampliar cualquier aspecto de este informe o aclarar las dudas que surjan durante la evaluación del alojamiento.</p>
 
 <!-- ============================== ANEXO A ============================== -->
 <h2 id="aA" class="nueva">Anexo A. Comandos de instalación y operación</h2>
 
-<p class="anexo-intro">Los comandos se ejecutan en la carpeta del código fuente, en el servidor. En los ejemplos, el archivo de configuración de los contenedores es docker-compose.prod.yaml.</p>
+<p class="anexo-intro">Los comandos se ejecutan en el servidor, en la carpeta que contiene el archivo de los contenedores (docker-compose.prod.yaml) y el de configuración (.env). En ambas formas de instalación, el archivo .env define:</p>
+<pre>POSTGRES_PASSWORD=...   # contraseña de la base de datos (solo letras y números),
+                        # por ejemplo la salida de: openssl rand -hex 24
+WEB_PORT=8080           # o 127.0.0.1:8080 si el proxy está en la misma máquina</pre>
 
-<h3>A.1 Instalación</h3>
-<pre>cp .env.example .env
-# Editar .env y definir:
-#   POSTGRES_PASSWORD   contraseña de la base de datos (solo letras y números),
-#                       por ejemplo la salida de: openssl rand -hex 24
-#   WEB_PORT            8080, o 127.0.0.1:8080 si el proxy está en la misma máquina
-
+<h3>A.1 Instalación con construcción en el servidor</h3>
+<pre>git clone &lt;repositorio&gt; bjff-book-locator &amp;&amp; cd bjff-book-locator
+cp .env.example .env    # y completar los valores
 docker compose -f docker-compose.prod.yaml up -d --build</pre>
 
-<h3>A.2 Verificación</h3>
+<h3>A.2 Instalación con imágenes ya construidas</h3>
+<pre># En el equipo del responsable técnico, con el código fuente:
+docker compose -f docker-compose.prod.yaml build
+docker save bjff-book-locator-api bjff-book-locator-web postgres:16-alpine \
+  | gzip &gt; bjff-imagenes.tar.gz
+
+# En el servidor, después de copiar bjff-imagenes.tar.gz, docker-compose.prod.yaml y .env:
+gunzip -c bjff-imagenes.tar.gz | docker load
+docker compose -f docker-compose.prod.yaml up -d</pre>
+
+<h3>A.3 Verificación</h3>
 <pre>docker compose -f docker-compose.prod.yaml ps     # api y postgres en estado "healthy"
 curl http://localhost:8080/api/health             # respuesta: {"status":"ok"}</pre>
 
-<h3>A.3 Operación</h3>
+<h3>A.4 Operación</h3>
 <div class="cuadro">
   <p class="titulo"><b>Cuadro A.1.</b> Comandos de operación. DC abrevia: docker compose -f docker-compose.prod.yaml</p>
   <table>
@@ -522,8 +528,8 @@ curl http://localhost:8080/api/health             # respuesta: {"status":"ok"}</
       <tr><td>Consultar el estado</td><td class="mono">DC ps</td></tr>
       <tr><td>Consultar los registros</td><td class="mono">DC logs -f api</td></tr>
       <tr><td>Detener y volver a iniciar</td><td class="mono">DC down<br>DC up -d</td></tr>
-      <tr><td>Instalar una versión nueva</td><td class="mono">git pull<br>DC up -d --build</td></tr>
-      <tr><td>Aplicar parches de las imágenes base</td><td class="mono">DC build --pull<br>DC pull postgres<br>DC up -d</td></tr>
+      <tr><td>Instalar una versión nueva</td><td class="mono">git pull<br>DC up -d --build<span class="nota-celda">Con imágenes ya construidas: cargar el archivo nuevo (A.2) y DC up -d</span></td></tr>
+      <tr><td>Aplicar parches de las imágenes base</td><td class="mono">DC build --pull<br>DC pull postgres<br>DC up -d<span class="nota-celda">Con imágenes ya construidas: se aplican en el equipo del responsable y se entrega un archivo nuevo</span></td></tr>
       <tr><td>Respaldar la base de datos</td><td class="mono">DC exec -T postgres pg_dump -U bjff -Fc bjff_book_locator \<br>&nbsp;&nbsp;&gt; respaldo.dump</td></tr>
       <tr><td>Restaurar un respaldo</td><td class="mono">DC exec -T postgres pg_restore -U bjff -d bjff_book_locator \<br>&nbsp;&nbsp;--clean --if-exists &lt; respaldo.dump</td></tr>
     </tbody>
@@ -534,7 +540,7 @@ curl http://localhost:8080/api/health             # respuesta: {"status":"ok"}</
 <!-- ============================== ANEXO B ============================== -->
 <h2 id="aB">Anexo B. Ejemplo de configuración del proxy inverso</h2>
 
-<p class="anexo-intro">Ejemplo de referencia en caso de que el proxy del DATIC utilice nginx y resida en la misma máquina que el sistema. El nombre del servidor y los certificados deben ajustarse a los institucionales.</p>
+<p class="anexo-intro">Ejemplo de referencia para un proxy inverso con nginx que resida en la misma máquina que el sistema. El nombre del servidor y las rutas de los certificados son ilustrativos.</p>
 <pre>server {
     listen 443 ssl;
     server_name localizador.biblioteca.tec.ac.cr;
