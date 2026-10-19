@@ -15,6 +15,8 @@ navegador ──► Vercel (web estática)
 
 Vercel reenvía `/api/*` a la API. Así el navegador habla con un solo origen, como en desarrollo con el proxy de Vite, y la cookie de sesión funciona sin configurar CORS.
 
+Para un servidor propio, la alternativa es la [instalación con Docker](instalacion-docker.md).
+
 > Las condiciones de los planes gratuitos cambian. Antes de empezar, conviene revisar los límites vigentes de cada servicio.
 
 ## 1. Base de datos en Neon

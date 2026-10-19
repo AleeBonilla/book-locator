@@ -10,6 +10,7 @@ Localizador de libros de la Biblioteca José Figueres Ferrer (Tecnológico de Co
 | `apps/web` | Web en React + Vite: búsqueda pública (`/`), acceso (`/acceso`) y panel (`/admin`). |
 | `packages/classification` | Paquete `@bjff/classification`: normaliza y ordena códigos ([`docs/normalization.md`](docs/normalization.md)). Lo usan la API y la web. |
 | `database` | Migraciones de PostgreSQL, que `docker-compose.yaml` aplica al crear la base. |
+| `docker` | Configuración de nginx para la imagen de producción de la web ([`Dockerfile`](Dockerfile)). |
 | `docs` | Referencia de la API, reglas de los códigos, guía para dibujar planos y decisiones. |
 
 Es un monorepo con [npm workspaces](https://docs.npmjs.com/cli/using-npm/workspaces): hay un solo `package-lock.json` y un solo `node_modules`, en la raíz.
@@ -47,4 +48,12 @@ npm run build                    # paquete, API (apps/api/dist) y web (apps/web/
 
 ## Despliegue
 
-Web en Vercel, API en Render y base en Neon, con planes gratuitos: [`docs/despliegue.md`](docs/despliegue.md).
+Hay dos formas, con el mismo código:
+
+- **Servicios gratuitos**: web en Vercel, API en Render y base en Neon ([`docs/despliegue.md`](docs/despliegue.md)).
+- **Servidor propio con Docker**: base, API y web en contenedores, con [`docker-compose.prod.yaml`](docker-compose.prod.yaml) ([`docs/instalacion-docker.md`](docs/instalacion-docker.md)).
+
+```sh
+cp .env.example .env             # POSTGRES_PASSWORD y WEB_PORT
+docker compose -f docker-compose.prod.yaml up -d --build
+```
