@@ -5,7 +5,9 @@ Historias principales implementadas en BJFF Book Locator, agrupadas por quién l
 **Estado de cada parte**
 
 - **Backend:** API en `apps/api`, en `main`, con pruebas automáticas.
-- **Frontend:** prototipos en `apps/web`, sin conexión al backend todavía (ramas `frontend-design` y `frontend-admin`, en revisión).
+- **Frontend:** web en `apps/web`, en `main`, conectada a la API.
+
+Los requerimientos que se derivan de estas historias, con su trazabilidad, están en [`docs/requirements.md`](docs/requirements.md).
 
 ## Lectores (búsqueda pública)
 
@@ -182,6 +184,5 @@ Historias principales implementadas en BJFF Book Locator, agrupadas por quién l
 
 ## Pendiente
 
-- Conectar el frontend con la API.
 - Importar los rangos desde el Excel de la colección.
 - Limitar la cantidad de búsquedas por IP (decisión 0007, pendiente).

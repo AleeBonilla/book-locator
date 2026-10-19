@@ -53,6 +53,8 @@ Hay dos formas, con el mismo código:
 - **Servicios gratuitos**: web en Vercel, API en Render y base en Neon ([`docs/despliegue.md`](docs/despliegue.md)).
 - **Servidor propio con Docker**: base, API y web en contenedores, con [`docker-compose.prod.yaml`](docker-compose.prod.yaml) ([`docs/instalacion-docker.md`](docs/instalacion-docker.md)).
 
+Los requisitos para alojarlo (servidor, red, seguridad y operación) están en el [informe de alojamiento](docs/informe-alojamiento.md), y los requerimientos del sistema en [`docs/requirements.md`](docs/requirements.md).
+
 ```sh
 cp .env.example .env             # POSTGRES_PASSWORD y WEB_PORT
 docker compose -f docker-compose.prod.yaml up -d --build
