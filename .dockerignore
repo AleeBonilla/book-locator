@@ -1,0 +1,8 @@
+# Lo que no entra al contexto de construcción del Dockerfile: dependencias y
+# compilaciones locales (se rehacen dentro de la imagen), secretos y planos de
+# trabajo.
+**/node_modules
+**/dist
+**/.env
+.git
+/*.svg
