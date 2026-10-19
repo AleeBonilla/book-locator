@@ -1,0 +1,79 @@
+# Producción en un servidor propio con Docker: base de datos, migraciones, API
+# y web. Las variables salen de .env (plantilla: .env.example). Instalación y
+# operación: docs/instalacion-docker.md.
+#
+#   docker compose -f docker-compose.prod.yaml up -d --build
+#
+# Para desarrollo se sigue usando docker-compose.yaml (solo PostgreSQL).
+
+# Nombre propio del proyecto: así sus contenedores y su volumen no se mezclan
+# con los de desarrollo en la misma máquina.
+name: bjff-book-locator-prod
+
+# La API y las migraciones se conectan a la base con la misma cadena.
+x-database-url: &database-url
+  DATABASE_URL: postgres://bjff:${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}@postgres:5432/bjff_book_locator
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bjff_book_locator
+      POSTGRES_USER: bjff
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+    # Sin `ports`: la base solo es accesible desde los otros contenedores.
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bjff -d bjff_book_locator"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Aplica las migraciones pendientes de database/ y termina. Corre en cada
+  # `up`; si no hay pendientes, no hace nada.
+  migrate:
+    image: bjff-book-locator-api
+    pull_policy: never
+    command: ["node", "apps/api/dist/scripts/migrate.js"]
+    environment: *database-url
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      target: api
+    image: bjff-book-locator-api
+    restart: unless-stopped
+    environment: *database-url
+    # Sin `ports`: solo la web (nginx) le habla.
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  web:
+    build:
+      context: .
+      target: web
+    image: bjff-book-locator-web
+    restart: unless-stopped
+    # WEB_PORT=8080 escucha en todas las interfaces; 127.0.0.1:8080, solo en
+    # la propia máquina (detrás de un proxy inverso con HTTPS).
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
