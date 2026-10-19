@@ -89,7 +89,7 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
   <div class="centro">
     <p class="tipo">Informe técnico</p>
     <h1>Especificaciones técnicas y requisitos de alojamiento del sistema BJFF Book Locator</h1>
-    <p class="sub">Solicitud de infraestructura para la puesta en producción del localizador de libros de la Biblioteca José Figueres Ferrer</p>
+    <p class="sub">Información técnica sobre lo que necesita el localizador de libros de la Biblioteca José Figueres Ferrer para funcionar correctamente en un servidor institucional</p>
   </div>
 
   <dl class="datos">
@@ -115,7 +115,7 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
     <li data-ref="s7"><span class="t">7. Seguridad y protección de datos</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="s8"><span class="t">8. Instalación, operación y mantenimiento</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="s9"><span class="t">9. Pruebas de rendimiento y capacidad</span><span class="p"></span><span class="n"></span></li>
-    <li data-ref="s10"><span class="t">10. Solicitud al DATIC</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s10"><span class="t">10. Resumen de requisitos</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="aA"><span class="t">Anexo A. Comandos de instalación y operación</span><span class="p"></span><span class="n"></span></li>
     <li data-ref="aB"><span class="t">Anexo B. Ejemplo de configuración del proxy inverso</span><span class="p"></span><span class="n"></span></li>
   </ol>
@@ -124,17 +124,18 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
 <!-- ============================== 1 ============================== -->
 <h2 id="s1" class="nueva">1. Introducción</h2>
 
-<p>El presente informe tiene como propósito presentar al Departamento de Administración de Tecnologías de Información y Comunicación (DATIC) las especificaciones técnicas del sistema BJFF Book Locator y los recursos que requiere para alojarse en la infraestructura del Instituto Tecnológico de Costa Rica.</p>
+<p>El presente informe responde a la consulta del Departamento de Administración de Tecnologías de Información y Comunicación (DATIC) sobre lo que necesita el sistema BJFF Book Locator para alojarse en la infraestructura del Instituto Tecnológico de Costa Rica. Su propósito es explicar las especificaciones técnicas del sistema y los recursos con los que debe contar el servidor para que funcione correctamente.</p>
 
-<p>BJFF Book Locator es una aplicación web que permite a las personas usuarias de la Biblioteca José Figueres Ferrer ubicar físicamente un libro dentro de la sala a partir de su código de clasificación. El sistema muestra, sobre un plano de la sala, el mueble y el anaquel donde se encuentra el material. Además, ofrece al personal de la biblioteca un panel de administración para mantener actualizada esa información sin intervención de los desarrolladores.</p>
+<p>BJFF Book Locator es una aplicación web que permite a las personas usuarias de la Biblioteca José Figueres Ferrer ubicar físicamente un libro dentro de la sala general, el espacio donde se encuentra la colección, a partir de su código de clasificación. El sistema muestra, sobre un plano de la sala, el mueble y el anaquel donde se encuentra el material. Además, ofrece al personal de la biblioteca un panel de administración para mantener actualizada esa información sin intervención de los desarrolladores.</p>
 
-<p>El documento se organiza de la siguiente manera. Las secciones 2 y 3 describen el origen del proyecto y su evolución. Las secciones 4 y 5 presentan el sistema y su arquitectura. Las secciones 6 a 9 detallan los requisitos de alojamiento, las medidas de seguridad, el modelo de operación propuesto y los resultados de las pruebas de rendimiento. La sección 10 resume la solicitud concreta al DATIC. Los anexos contienen los comandos de instalación y un ejemplo de configuración del proxy inverso.</p>
+<p>El documento se organiza de la siguiente manera. Las secciones 2 y 3 describen el origen del proyecto y su evolución. Las secciones 4 y 5 presentan el sistema y su arquitectura. Las secciones 6 a 9 detallan los requisitos de alojamiento, las medidas de seguridad, el modelo de operación propuesto y los resultados de las pruebas de rendimiento. La sección 10 resume los requisitos para que el sistema funcione correctamente. Los anexos contienen los comandos de instalación y un ejemplo de configuración del proxy inverso.</p>
 
 <!-- ============================== 2 ============================== -->
 <h2 id="s2">2. Antecedentes y contexto del proyecto</h2>
 
 <h3>2.1 Necesidad que atiende</h3>
-<p>Los libros de la sala general de la biblioteca se ordenan en los estantes según el Sistema de Clasificación Decimal Dewey. Una persona puede encontrar el código de clasificación de un libro en el catálogo, pero ese código no le indica en qué parte de la sala está el mueble que lo contiene. La sala general cuenta con 316 muebles distribuidos en 10 filas, por lo que localizar un libro puede tomar tiempo y, con frecuencia, requiere la ayuda del personal.</p>
+<p>En este documento, la sala se refiere al espacio físico de la biblioteca donde se encuentra la colección de libros a disposición del público, organizada en muebles de estantería. El sistema trabaja con la sala general, la principal de la Biblioteca José Figueres Ferrer. Cada mueble de la sala se divide en anaqueles, que son los niveles o repisas donde se colocan los libros, y los muebles se agrupan en filas de dos caras.</p>
+<p>Los libros de la sala general se ordenan en los estantes según el Sistema de Clasificación Decimal Dewey. Una persona puede encontrar el código de clasificación de un libro en el catálogo, pero ese código no le indica en qué parte de la sala está el mueble que lo contiene. La sala general cuenta con 316 muebles distribuidos en 10 filas, por lo que localizar un libro puede tomar tiempo y, con frecuencia, requiere la ayuda del personal.</p>
 <p>BJFF Book Locator responde a esa necesidad: recibe el código tal como aparece en el catálogo, determina qué mueble y qué anaquel lo contienen y lo señala en el plano de la sala.</p>
 
 <h3>2.2 Origen</h3>
@@ -142,7 +143,7 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
 
 <h3>2.3 Continuidad y estado actual</h3>
 <p>Durante el I semestre de 2026 el proyecto continuó como parte de las horas estudiantiles de Alexander Bonilla Figueroa, con reuniones periódicas de seguimiento con la jefatura de la biblioteca. En el II semestre de 2026 se construyó la versión actual del sistema, que se presentó formalmente el miércoles 14 de octubre de 2026 ante las personas vinculadas al proyecto de señalización.</p>
-<p>En la actualidad existe una versión de demostración alojada en servicios gratuitos en la nube. Esos servicios suspenden la aplicación tras unos minutos sin uso, lo que provoca demoras de hasta un minuto en la primera consulta, y no ofrecen garantías de continuidad. Por esta razón se solicita alojar el sistema en la infraestructura institucional, con un dominio propio del TEC, respaldos periódicos y una operación estable que no dependa de la permanencia de los estudiantes que lo desarrollaron.</p>
+<p>En la actualidad existe una versión de demostración alojada en servicios gratuitos en la nube. Esos servicios suspenden la aplicación tras unos minutos sin uso, lo que provoca demoras de hasta un minuto en la primera consulta, y no ofrecen garantías de continuidad. Para el uso permanente del sistema se contempla alojarlo en la infraestructura institucional, con un dominio propio del TEC, respaldos periódicos y una operación estable que no dependa de la permanencia de los estudiantes que lo desarrollaron. En ese marco, el DATIC consultó qué necesita el sistema para alojarse, y este informe reúne esa información.</p>
 
 <!-- ============================== 3 ============================== -->
 <h2 id="s3">3. Línea de tiempo del proyecto</h2>
@@ -151,7 +152,7 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
 
 <figure>
   <figcaption><b>Figura 1.</b> Línea de tiempo del proyecto BJFF Book Locator.</figcaption>
-  <svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" font-family="Calibri, sans-serif">
+  <svg viewBox="0 0 640 226" xmlns="http://www.w3.org/2000/svg" font-family="Calibri, sans-serif">
     <!-- Etapas -->
     <rect x="10" y="40" width="200" height="34" fill="#dfe6ef"/>
     <rect x="220" y="40" width="200" height="34" fill="#c3d0e0"/>
@@ -188,9 +189,9 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
       <text x="530" y="192">Presentación formal</text><text x="530" y="205">(14 oct. 2026)</text>
       <circle cx="610" cy="104" r="6" fill="#ffffff" stroke="#0b2e59" stroke-width="2.2"/>
       <line x1="610" y1="110" x2="610" y2="128" stroke="#9aa5b4"/>
-      <text x="630" y="142" text-anchor="end">Solicitud de</text><text x="630" y="155" text-anchor="end">alojamiento</text>
+      <text x="630" y="142" text-anchor="end">Informe de</text><text x="630" y="155" text-anchor="end">alojamiento</text>
     </g>
-    <text x="10" y="240" font-size="9.5" fill="#5a5a5a">El círculo sin relleno indica la etapa en curso: este informe.</text>
+    <text x="10" y="222" font-size="9.5" fill="#5a5a5a">El círculo sin relleno indica la etapa en curso: este informe.</text>
   </svg>
 </figure>
 
@@ -227,7 +228,7 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
   <li>Descripción de la sala como una jerarquía de ubicaciones: fila, cara, mueble y anaquel.</li>
   <li>Asignación del rango de códigos de cada mueble o anaquel, con validación según las reglas de clasificación de la biblioteca.</li>
   <li>Carga del plano de la sala en formato SVG, dibujado con cualquier herramienta de diseño y validado antes de aceptarse.</li>
-  <li>Publicación de una versión completa del mapa de la sala y preparación de cambios en una copia, sin afectar la búsqueda pública.</li>
+  <li>Publicación de una configuración completa de la sala (estructura, rangos y plano) y preparación de cambios en una copia, sin afectar la búsqueda pública.</li>
 </ul>
 
 <h3>4.3 Criticidad</h3>
@@ -244,21 +245,21 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
     <defs>
       <marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
     </defs>
-    <!-- Internet -->
-    <rect x="4" y="92" width="92" height="50" rx="4" fill="#ffffff" stroke="#5a5a5a"/>
-    <text x="50" y="114" text-anchor="middle" font-size="12" font-weight="600">Navegador</text>
-    <text x="50" y="130" text-anchor="middle" font-size="10" fill="#5a5a5a">público y personal</text>
-    <line x1="96" y1="117" x2="124" y2="117" stroke="#333" stroke-width="1.2" marker-end="url(#f)"/>
-    <text x="110" y="109" text-anchor="middle" font-size="9.5" fill="#333">HTTPS</text>
-    <!-- Proxy DATIC -->
-    <rect x="126" y="92" width="96" height="50" rx="4" fill="#ffffff" stroke="#5a5a5a"/>
-    <text x="174" y="114" text-anchor="middle" font-size="12" font-weight="600">Proxy inverso</text>
-    <text x="174" y="130" text-anchor="middle" font-size="10" fill="#5a5a5a">DATIC · certificado</text>
-    <line x1="222" y1="117" x2="256" y2="117" stroke="#333" stroke-width="1.2" marker-end="url(#f)"/>
-    <text x="239" y="109" text-anchor="middle" font-size="9.5" fill="#333">HTTP</text>
-    <!-- Servidor -->
+    <!-- Servidor (se dibuja primero para que no tape las flechas que entran) -->
     <rect x="244" y="8" width="392" height="214" rx="6" fill="#f3f5f8" stroke="#9aa5b4" stroke-dasharray="5 4"/>
     <text x="256" y="26" font-size="11" font-weight="600" fill="#0b2e59">Máquina virtual Linux · Docker Compose</text>
+    <!-- Internet -->
+    <rect x="2" y="92" width="82" height="50" rx="4" fill="#ffffff" stroke="#5a5a5a"/>
+    <text x="43" y="114" text-anchor="middle" font-size="12" font-weight="600">Navegador</text>
+    <text x="43" y="130" text-anchor="middle" font-size="9.5" fill="#5a5a5a">público y personal</text>
+    <line x1="84" y1="117" x2="110" y2="117" stroke="#333" stroke-width="1.2" marker-end="url(#f)"/>
+    <text x="98" y="108" text-anchor="middle" font-size="9" fill="#333">HTTPS</text>
+    <!-- Proxy DATIC -->
+    <rect x="112" y="92" width="94" height="50" rx="4" fill="#ffffff" stroke="#5a5a5a"/>
+    <text x="159" y="114" text-anchor="middle" font-size="12" font-weight="600">Proxy inverso</text>
+    <text x="159" y="130" text-anchor="middle" font-size="10" fill="#5a5a5a">DATIC · certificado</text>
+    <line x1="206" y1="117" x2="256" y2="117" stroke="#333" stroke-width="1.2" marker-end="url(#f)"/>
+    <text x="224" y="109" text-anchor="middle" font-size="9.5" fill="#333">HTTP</text>
     <!-- web -->
     <rect x="258" y="92" width="104" height="50" rx="4" fill="#ffffff" stroke="#0b2e59" stroke-width="1.3"/>
     <text x="310" y="114" text-anchor="middle" font-size="12" font-weight="600">web</text>
@@ -450,7 +451,7 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
 <!-- ============================== 9 ============================== -->
 <h2 id="s9">9. Pruebas de rendimiento y capacidad</h2>
 
-<p>Las mediciones se realizaron el 19 de octubre de 2026 sobre las imágenes de producción, con los datos reales de la sala general: 1941 ubicaciones y un plano de 830 KB. El equipo de prueba fue una computadora con Windows 11 y Docker Desktop, que tenía asignados 12 procesadores y 12 GB de memoria. En un servidor de menor capacidad el rendimiento será menor, pero el consumo de memoria se mantiene comparable.</p>
+<p>Las mediciones se realizaron sobre las imágenes de producción, con los datos reales de la sala general: 1941 ubicaciones y un plano de 830 KB. El equipo de prueba fue una computadora con Windows 11 y Docker Desktop, que tenía asignados 12 procesadores y 12 GB de memoria. En un servidor de menor capacidad el rendimiento será menor, pero el consumo de memoria se mantiene comparable.</p>
 
 <div class="cuadro">
   <p class="titulo"><b>Cuadro 9.</b> Resultados de las mediciones.</p>
@@ -469,23 +470,23 @@ pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8
   </table>
 </div>
 
-<p>La demanda esperada es de algunas decenas de personas usuarias simultáneas, muy inferior a la capacidad medida. El crecimiento de la base de datos también es reducido: cada nueva versión del mapa de la sala añade alrededor de 2 MB. Con base en estos resultados, una máquina virtual con los recursos recomendados del Cuadro 4 atiende la demanda prevista con amplio margen.</p>
+<p>La demanda esperada es de algunas decenas de personas usuarias simultáneas, muy inferior a la capacidad medida. El crecimiento de la base de datos también es reducido: cada nueva versión de la configuración de la sala añade alrededor de 2 MB. Con base en estos resultados, una máquina virtual con los recursos recomendados del Cuadro 4 atiende la demanda prevista con amplio margen.</p>
 
 <!-- ============================== 10 ============================== -->
-<h2 id="s10">10. Solicitud al DATIC</h2>
+<h2 id="s10">10. Resumen de requisitos</h2>
 
-<p>Con fundamento en lo expuesto, se solicita respetuosamente al DATIC lo siguiente:</p>
+<p>En síntesis, para que el sistema funcione correctamente en la infraestructura institucional necesita lo siguiente:</p>
 <ol>
   <li>Una máquina virtual Linux de 64 bits con 2 vCPU, 2 GB de memoria y 20 GB de disco (como mínimo, 1 vCPU, 1 GB y 10 GB).</li>
-  <li>La instalación de Docker Engine y Docker Compose versión 2, con el servicio habilitado al inicio del sistema operativo.</li>
-  <li>Un subdominio institucional que apunte a la raíz del sistema, con certificado HTTPS y un proxy inverso hacia el puerto del sistema que admita solicitudes de hasta 6 MB.</li>
-  <li>Salida a internet desde el servidor hacia Docker Hub, registry.npmjs.org y GitHub, para la instalación y las actualizaciones.</li>
-  <li>Acceso remoto por SSH para el responsable técnico del sistema.</li>
-  <li>El respaldo diario de la base de datos, almacenado fuera del servidor.</li>
-  <li>De ser posible, la limitación de intentos de inicio de sesión por dirección IP en el proxy y el monitoreo de la dirección /api/health.</li>
+  <li>Docker Engine y Docker Compose versión 2 instalados, con el servicio habilitado al inicio del sistema operativo.</li>
+  <li>Un subdominio que apunte a la raíz del sistema, con certificado HTTPS y un proxy inverso hacia el puerto del sistema que admita solicitudes de hasta 6 MB.</li>
+  <li>Salida a internet desde el servidor hacia Docker Hub, registry.npmjs.org y GitHub durante la instalación y las actualizaciones.</li>
+  <li>Acceso remoto por SSH para el responsable técnico del sistema, para la instalación y el mantenimiento.</li>
+  <li>Un respaldo diario de la base de datos, almacenado fuera del servidor.</li>
 </ol>
+<p>Como medidas complementarias se recomiendan la limitación de intentos de inicio de sesión por dirección IP en el proxy y el monitoreo de la dirección /api/health.</p>
 
-<p>Quedo a disposición para ampliar cualquier aspecto de este informe, coordinar la instalación o atender los requisitos adicionales que el DATIC considere necesarios.</p>
+<p>Quedo a disposición para ampliar cualquier aspecto de este informe o aclarar las dudas que surjan durante la evaluación del alojamiento.</p>
 
 <div class="firma">
   Alexander Bonilla Figueroa<br>
