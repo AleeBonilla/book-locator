@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Informe técnico de alojamiento — BJFF Book Locator</title>
+<style>
+@page {
+  size: letter;
+  margin: 25mm 25mm 22mm 25mm;
+  @top-left { content: "BJFF Book Locator · Informe técnico de alojamiento"; font: 8.5pt Calibri, sans-serif; color: #6b6b6b; vertical-align: bottom; padding-bottom: 4mm; }
+  @top-right { content: "Biblioteca José Figueres Ferrer · TEC"; font: 8.5pt Calibri, sans-serif; color: #6b6b6b; vertical-align: bottom; padding-bottom: 4mm; }
+  @bottom-center { content: "Página " counter(page) " de " counter(pages); font: 8.5pt Calibri, sans-serif; color: #6b6b6b; }
+}
+@page :first {
+  margin: 0;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-center { content: none; }
+}
+
+:root { --azul: #0b2e59; --gris: #5a5a5a; --regla: #9aa5b4; }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font: 11pt/1.5 Cambria, Georgia, serif; color: #1a1a1a; text-align: justify; hyphens: auto; }
+
+/* Portada */
+.portada { height: 279.4mm; padding: 30mm 28mm 24mm; display: flex; flex-direction: column; break-after: page; text-align: left; position: relative; }
+.portada::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 9mm; background: var(--azul); }
+.portada .institucion { font: 600 13pt Calibri, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--azul); margin: 0; }
+.portada .dependencia { font: 12pt Calibri, sans-serif; color: var(--gris); margin: 2mm 0 0; }
+.portada .centro { margin-top: 62mm; }
+.portada .tipo { font: 600 11pt Calibri, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--gris); margin: 0 0 4mm; }
+.portada h1 { font: 600 26pt/1.2 Calibri, sans-serif; color: #111; margin: 0; max-width: 140mm; }
+.portada .sub { font: 14pt/1.35 Cambria, serif; color: #333; margin: 5mm 0 0; max-width: 140mm; }
+.portada .datos { margin-top: auto; border-top: 1px solid var(--regla); padding-top: 6mm; font: 10.5pt/1.6 Calibri, sans-serif; display: grid; grid-template-columns: 38mm 1fr; column-gap: 6mm; row-gap: 1.5mm; }
+.portada .datos dt { color: var(--gris); }
+.portada .datos dd { margin: 0; color: #111; }
+
+/* Índice */
+.indice { break-after: page; }
+.indice h2 { margin-top: 0; }
+.indice ol { list-style: none; padding: 0; margin: 0; font: 11pt/1.9 Calibri, sans-serif; }
+.indice li { display: flex; align-items: baseline; gap: 2mm; }
+.indice li.sub { padding-left: 7mm; font-size: 10.5pt; color: #333; }
+.indice li .t { flex: none; }
+.indice li .p { flex: 1; border-bottom: 1px dotted #9a9a9a; transform: translateY(-1mm); }
+.indice li .n { flex: none; min-width: 6mm; text-align: right; }
+
+/* Títulos */
+h2 { font: 600 15pt/1.25 Calibri, sans-serif; color: var(--azul); margin: 9mm 0 3mm; break-after: avoid; }
+h3 { font: 600 12pt/1.3 Calibri, sans-serif; color: #1a1a1a; margin: 6mm 0 2mm; break-after: avoid; }
+h2.nueva { break-before: page; margin-top: 0; }
+p { margin: 0 0 3mm; orphans: 3; widows: 3; }
+ul, ol { margin: 0 0 3mm; padding-left: 7mm; }
+li { margin-bottom: 1.2mm; }
+
+/* Cuadros (tablas) */
+.cuadro { margin: 4mm 0 5mm; break-inside: avoid; }
+.cuadro .titulo, figure figcaption { font: 10pt/1.4 Calibri, sans-serif; color: #1a1a1a; margin: 0 0 1.5mm; text-align: left; }
+.cuadro .titulo b, figure figcaption b { font-weight: 600; }
+.cuadro .fuente, figure .fuente { font: 8.5pt/1.35 Calibri, sans-serif; color: var(--gris); margin-top: 1.5mm; text-align: left; }
+table { width: 100%; border-collapse: collapse; font: 9.8pt/1.4 Calibri, sans-serif; text-align: left; border-top: 1.4px solid #222; border-bottom: 1.4px solid #222; }
+thead th { font-weight: 600; border-bottom: 0.8px solid #222; padding: 1.8mm 2.5mm; vertical-align: bottom; }
+tbody td { padding: 1.6mm 2.5mm; vertical-align: top; border-bottom: 0.5px solid #d4d4d4; }
+tbody tr:last-child td { border-bottom: none; }
+td.num { white-space: nowrap; }
+td, th { hyphens: manual; }
+td.mono { white-space: nowrap; font-size: 8.6pt; }
+.cuadro.partible { break-inside: auto; }
+.cuadro .titulo { break-after: avoid; }
+
+figure { margin: 4mm 0 5mm; break-inside: avoid; }
+figure svg { display: block; width: 100%; height: auto; }
+
+code, .mono { font: 9pt Consolas, "Cascadia Mono", monospace; }
+pre { font: 8.8pt/1.45 Consolas, "Cascadia Mono", monospace; background: #f5f6f8; border-left: 2.5px solid var(--azul); padding: 3mm 4mm; margin: 2mm 0 4mm; white-space: pre-wrap; text-align: left; break-inside: avoid; }
+
+.firma { margin-top: 10mm; font: 10.5pt/1.6 Calibri, sans-serif; text-align: left; }
+.anexo-intro { font-size: 10.5pt; }
+</style>
+</head>
+<body>
+
+<!-- ============================== PORTADA ============================== -->
+<section class="portada">
+  <p class="institucion">Instituto Tecnológico de Costa Rica</p>
+  <p class="dependencia">Biblioteca José Figueres Ferrer</p>
+
+  <div class="centro">
+    <p class="tipo">Informe técnico</p>
+    <h1>Especificaciones técnicas y requisitos de alojamiento del sistema BJFF Book Locator</h1>
+    <p class="sub">Solicitud de infraestructura para la puesta en producción del localizador de libros de la Biblioteca José Figueres Ferrer</p>
+  </div>
+
+  <dl class="datos">
+    <dt>Dirigido a</dt><dd>Departamento de Administración de Tecnologías de Información y Comunicación (DATIC)</dd>
+    <dt>Elaborado por</dt><dd>Alexander Bonilla Figueroa, responsable técnico del sistema</dd>
+    <dt>Correo de contacto</dt><dd>alebonilla@estudiantec.cr</dd>
+    <dt>Proyecto</dt><dd>Proyecto de señalización de la Biblioteca José Figueres Ferrer</dd>
+    <dt>Lugar y fecha</dt><dd>Cartago, 19 de octubre de 2026</dd>
+    <dt>Versión</dt><dd>1.0</dd>
+  </dl>
+</section>
+
+<!-- ============================== ÍNDICE ============================== -->
+<section class="indice">
+  <h2>Contenido</h2>
+  <ol id="toc">
+    <li data-ref="s1"><span class="t">1. Introducción</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s2"><span class="t">2. Antecedentes y contexto del proyecto</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s3"><span class="t">3. Línea de tiempo del proyecto</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s4"><span class="t">4. Descripción del sistema</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s5"><span class="t">5. Arquitectura y especificaciones técnicas</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s6"><span class="t">6. Requisitos de alojamiento</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s7"><span class="t">7. Seguridad y protección de datos</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s8"><span class="t">8. Instalación, operación y mantenimiento</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s9"><span class="t">9. Pruebas de rendimiento y capacidad</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="s10"><span class="t">10. Solicitud al DATIC</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="aA"><span class="t">Anexo A. Comandos de instalación y operación</span><span class="p"></span><span class="n"></span></li>
+    <li data-ref="aB"><span class="t">Anexo B. Ejemplo de configuración del proxy inverso</span><span class="p"></span><span class="n"></span></li>
+  </ol>
+</section>
+
+<!-- ============================== 1 ============================== -->
+<h2 id="s1" class="nueva">1. Introducción</h2>
+
+<p>El presente informe tiene como propósito presentar al Departamento de Administración de Tecnologías de Información y Comunicación (DATIC) las especificaciones técnicas del sistema BJFF Book Locator y los recursos que requiere para alojarse en la infraestructura del Instituto Tecnológico de Costa Rica.</p>
+
+<p>BJFF Book Locator es una aplicación web que permite a las personas usuarias de la Biblioteca José Figueres Ferrer ubicar físicamente un libro dentro de la sala a partir de su código de clasificación. El sistema muestra, sobre un plano de la sala, el mueble y el anaquel donde se encuentra el material. Además, ofrece al personal de la biblioteca un panel de administración para mantener actualizada esa información sin intervención de los desarrolladores.</p>
+
+<p>El documento se organiza de la siguiente manera. Las secciones 2 y 3 describen el origen del proyecto y su evolución. Las secciones 4 y 5 presentan el sistema y su arquitectura. Las secciones 6 a 9 detallan los requisitos de alojamiento, las medidas de seguridad, el modelo de operación propuesto y los resultados de las pruebas de rendimiento. La sección 10 resume la solicitud concreta al DATIC. Los anexos contienen los comandos de instalación y un ejemplo de configuración del proxy inverso.</p>
+
+<!-- ============================== 2 ============================== -->
+<h2 id="s2">2. Antecedentes y contexto del proyecto</h2>
+
+<h3>2.1 Necesidad que atiende</h3>
+<p>Los libros de la sala general de la biblioteca se ordenan en los estantes según el Sistema de Clasificación Decimal Dewey. Una persona puede encontrar el código de clasificación de un libro en el catálogo, pero ese código no le indica en qué parte de la sala está el mueble que lo contiene. La sala general cuenta con 316 muebles distribuidos en 10 filas, por lo que localizar un libro puede tomar tiempo y, con frecuencia, requiere la ayuda del personal.</p>
+<p>BJFF Book Locator responde a esa necesidad: recibe el código tal como aparece en el catálogo, determina qué mueble y qué anaquel lo contienen y lo señala en el plano de la sala.</p>
+
+<h3>2.2 Origen</h3>
+<p>El proyecto nació en el II semestre de 2025 como proyecto final del curso Requerimientos de Software (IC-5821). Isaac Corrales, estudiante del curso y entonces asistente de la Biblioteca José Figueres Ferrer, propuso la idea a la jefatura de la biblioteca, que la acogió. El trabajo se desarrolló junto con el estudiante Alexander Bonilla Figueroa y se integró desde ese momento al proyecto de señalización que la biblioteca ya impulsaba.</p>
+
+<h3>2.3 Continuidad y estado actual</h3>
+<p>Durante el I semestre de 2026 el proyecto continuó como parte de las horas estudiantiles de Alexander Bonilla Figueroa, con reuniones periódicas de seguimiento con la jefatura de la biblioteca. En el II semestre de 2026 se construyó la versión actual del sistema, que se presentó formalmente el miércoles 14 de octubre de 2026 ante las personas vinculadas al proyecto de señalización.</p>
+<p>En la actualidad existe una versión de demostración alojada en servicios gratuitos en la nube. Esos servicios suspenden la aplicación tras unos minutos sin uso, lo que provoca demoras de hasta un minuto en la primera consulta, y no ofrecen garantías de continuidad. Por esta razón se solicita alojar el sistema en la infraestructura institucional, con un dominio propio del TEC, respaldos periódicos y una operación estable que no dependa de la permanencia de los estudiantes que lo desarrollaron.</p>
+
+<!-- ============================== 3 ============================== -->
+<h2 id="s3">3. Línea de tiempo del proyecto</h2>
+
+<p>El desarrollo se dividió en tres etapas, una por semestre. Cada una partió de las lecciones de la anterior: el prototipo inicial validó la idea, la segunda etapa resolvió el ordenamiento de los códigos y definió el diseño a largo plazo, y la tercera construyó el sistema que hoy se propone poner en producción.</p>
+
+<figure>
+  <figcaption><b>Figura 1.</b> Línea de tiempo del proyecto BJFF Book Locator.</figcaption>
+  <svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" font-family="Calibri, sans-serif">
+    <!-- Etapas -->
+    <rect x="10" y="40" width="200" height="34" fill="#dfe6ef"/>
+    <rect x="220" y="40" width="200" height="34" fill="#c3d0e0"/>
+    <rect x="430" y="40" width="200" height="34" fill="#0b2e59"/>
+    <text x="110" y="62" text-anchor="middle" font-size="13" font-weight="600" fill="#0b2e59">II semestre 2025</text>
+    <text x="320" y="62" text-anchor="middle" font-size="13" font-weight="600" fill="#0b2e59">I semestre 2026</text>
+    <text x="530" y="62" text-anchor="middle" font-size="13" font-weight="600" fill="#ffffff">II semestre 2026</text>
+    <text x="110" y="28" text-anchor="middle" font-size="11" fill="#5a5a5a">Etapa 1 · Origen</text>
+    <text x="320" y="28" text-anchor="middle" font-size="11" fill="#5a5a5a">Etapa 2 · Diseño de la solución</text>
+    <text x="530" y="28" text-anchor="middle" font-size="11" fill="#5a5a5a">Etapa 3 · Sistema actual</text>
+    <!-- Eje -->
+    <line x1="10" y1="104" x2="630" y2="104" stroke="#1a1a1a" stroke-width="1.2"/>
+    <!-- Hitos etapa 1 -->
+    <g font-size="10.5" fill="#1a1a1a">
+      <circle cx="40" cy="104" r="5" fill="#0b2e59"/>
+      <line x1="40" y1="109" x2="40" y2="128" stroke="#9aa5b4"/>
+      <text x="40" y="142">Proyecto final del</text><text x="40" y="155">curso IC-5821</text>
+      <circle cx="130" cy="104" r="5" fill="#0b2e59"/>
+      <line x1="130" y1="109" x2="130" y2="178" stroke="#9aa5b4"/>
+      <text x="130" y="192">Requerimientos y</text><text x="130" y="205">prototipo inicial</text>
+      <!-- Hitos etapa 2 -->
+      <circle cx="250" cy="104" r="5" fill="#0b2e59"/>
+      <line x1="250" y1="109" x2="250" y2="128" stroke="#9aa5b4"/>
+      <text x="250" y="142">Motor de</text><text x="250" y="155">ordenamiento Dewey</text>
+      <circle cx="345" cy="104" r="5" fill="#0b2e59"/>
+      <line x1="345" y1="109" x2="345" y2="178" stroke="#9aa5b4"/>
+      <text x="345" y="192">Propuestas de interfaz</text><text x="345" y="205">y planos en SVG</text>
+      <!-- Hitos etapa 3 -->
+      <circle cx="445" cy="104" r="5" fill="#0b2e59"/>
+      <line x1="445" y1="109" x2="445" y2="128" stroke="#9aa5b4"/>
+      <text x="445" y="142">Inicio del sistema</text><text x="445" y="155">actual (set. 2026)</text>
+      <circle cx="530" cy="104" r="5" fill="#0b2e59"/>
+      <line x1="530" y1="109" x2="530" y2="178" stroke="#9aa5b4"/>
+      <text x="530" y="192">Presentación formal</text><text x="530" y="205">(14 oct. 2026)</text>
+      <circle cx="610" cy="104" r="6" fill="#ffffff" stroke="#0b2e59" stroke-width="2.2"/>
+      <line x1="610" y1="110" x2="610" y2="128" stroke="#9aa5b4"/>
+      <text x="630" y="142" text-anchor="end">Solicitud de</text><text x="630" y="155" text-anchor="end">alojamiento</text>
+    </g>
+    <text x="10" y="240" font-size="9.5" fill="#5a5a5a">El círculo sin relleno indica la etapa en curso: este informe.</text>
+  </svg>
+</figure>
+
+<p>La lección principal del prototipo inicial fue que las imágenes estáticas no escalaban: hacía falta una imagen por cada ubicación, eran difíciles de producir y mantener, y no indicaban con precisión el lugar del libro. El sistema actual las sustituye por un plano vectorial de la sala, en el que se resalta el mueble que corresponde a cada búsqueda. El Cuadro 1 resume el trabajo y los resultados de cada etapa.</p>
+
+<div class="cuadro">
+  <p class="titulo"><b>Cuadro 1.</b> Etapas del proyecto y sus resultados.</p>
+  <table>
+    <thead><tr><th style="width:24%">Etapa</th><th>Trabajo realizado</th><th style="width:30%">Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>1. II semestre 2025<br>Proyecto final del curso IC-5821</td><td>Levantamiento de requerimientos en reuniones con la biblioteca y estudio del Sistema de Clasificación Decimal Dewey.</td><td>Prototipo inicial que validó la idea. Mostraba imágenes estáticas por ubicación y presentaba errores de ordenamiento.</td></tr>
+      <tr><td>2. I semestre 2026<br>Horas estudiantiles</td><td>Estudio a fondo de las reglas de clasificación, reuniones de seguimiento con la jefatura, propuestas de interfaz y planos vectoriales.</td><td>Motor de ordenamiento correcto y el criterio de un sistema que el personal pueda mantener por sí mismo.</td></tr>
+      <tr><td>3. II semestre 2026<br>Sistema actual</td><td>Construcción de la base de datos, la API, el acceso del personal, el panel de administración, la búsqueda pública y los planos de la sala.</td><td>Sistema completo, presentado el 14 de octubre de 2026 y preparado para instalarse en un servidor institucional.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================== 4 ============================== -->
+<h2 id="s4">4. Descripción del sistema</h2>
+
+<h3>4.1 Personas usuarias</h3>
+<p>El sistema atiende a dos grupos. El público lector utiliza la búsqueda sin necesidad de crear una cuenta ni de identificarse. El personal de la biblioteca ingresa al panel de administración con una cuenta personal; las cuentas las crea el responsable técnico, y no existe registro público.</p>
+
+<h3>4.2 Funcionalidades principales</h3>
+<p>Para el público lector:</p>
+<ul>
+  <li>Búsqueda por código de clasificación, escrito tal como aparece en el catálogo, con o sin espacios, guiones o superíndices.</li>
+  <li>Indicación del mueble en el plano de la sala, con una flecha animada, y del anaquel, contado desde arriba.</li>
+  <li>Orientación hacia los muebles vecinos cuando el código cae entre dos rangos asignados.</li>
+  <li>Plano navegable con mouse, teclado y gestos táctiles, adaptado a teléfonos celulares.</li>
+</ul>
+<p>Para el personal de la biblioteca:</p>
+<ul>
+  <li>Descripción de la sala como una jerarquía de ubicaciones: fila, cara, mueble y anaquel.</li>
+  <li>Asignación del rango de códigos de cada mueble o anaquel, con validación según las reglas de clasificación de la biblioteca.</li>
+  <li>Carga del plano de la sala en formato SVG, dibujado con cualquier herramienta de diseño y validado antes de aceptarse.</li>
+  <li>Publicación de una versión completa del mapa de la sala y preparación de cambios en una copia, sin afectar la búsqueda pública.</li>
+</ul>
+
+<h3>4.3 Criticidad</h3>
+<p>Se trata de un servicio de apoyo y de criticidad baja. Si el sistema no estuviera disponible, las personas usuarias podrían localizar los libros como lo hacen actualmente, con la señalización física y la ayuda del personal. No procesa pagos ni datos académicos, y no se integra con otros sistemas institucionales.</p>
+
+<!-- ============================== 5 ============================== -->
+<h2 id="s5">5. Arquitectura y especificaciones técnicas</h2>
+
+<p>El sistema se compone de un sitio web, una interfaz de programación (API) y una base de datos relacional. Se distribuye en contenedores Docker, coordinados con Docker Compose, que se construyen en el propio servidor a partir del código fuente. Esta forma de entrega reduce los requisitos del servidor a Docker y hace que la instalación sea idéntica en cualquier distribución de Linux.</p>
+
+<figure>
+  <figcaption><b>Figura 2.</b> Arquitectura de despliegue propuesta.</figcaption>
+  <svg viewBox="0 0 640 230" xmlns="http://www.w3.org/2000/svg" font-family="Calibri, sans-serif">
+    <defs>
+      <marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+    </defs>
+    <!-- Internet -->
+    <rect x="4" y="92" width="92" height="50" rx="4" fill="#ffffff" stroke="#5a5a5a"/>
+    <text x="50" y="114" text-anchor="middle" font-size="12" font-weight="600">Navegador</text>
+    <text x="50" y="130" text-anchor="middle" font-size="10" fill="#5a5a5a">público y personal</text>
+    <line x1="96" y1="117" x2="124" y2="117" stroke="#333" stroke-width="1.2" marker-end="url(#f)"/>
+    <text x="110" y="109" text-anchor="middle" font-size="9.5" fill="#333">HTTPS</text>
+    <!-- Proxy DATIC -->
+    <rect x="126" y="92" width="96" height="50" rx="4" fill="#ffffff" stroke="#5a5a5a"/>
+    <text x="174" y="114" text-anchor="middle" font-size="12" font-weight="600">Proxy inverso</text>
+    <text x="174" y="130" text-anchor="middle" font-size="10" fill="#5a5a5a">DATIC · certificado</text>
+    <line x1="222" y1="117" x2="256" y2="117" stroke="#333" stroke-width="1.2" marker-end="url(#f)"/>
+    <text x="239" y="109" text-anchor="middle" font-size="9.5" fill="#333">HTTP</text>
+    <!-- Servidor -->
+    <rect x="244" y="8" width="392" height="214" rx="6" fill="#f3f5f8" stroke="#9aa5b4" stroke-dasharray="5 4"/>
+    <text x="256" y="26" font-size="11" font-weight="600" fill="#0b2e59">Máquina virtual Linux · Docker Compose</text>
+    <!-- web -->
+    <rect x="258" y="92" width="104" height="50" rx="4" fill="#ffffff" stroke="#0b2e59" stroke-width="1.3"/>
+    <text x="310" y="114" text-anchor="middle" font-size="12" font-weight="600">web</text>
+    <text x="310" y="130" text-anchor="middle" font-size="10" fill="#5a5a5a">nginx 1.28 · puerto 8080</text>
+    <line x1="362" y1="117" x2="392" y2="117" stroke="#333" stroke-width="1.2" marker-end="url(#f)"/>
+    <text x="377" y="109" text-anchor="middle" font-size="9.5" fill="#333">/api</text>
+    <!-- api -->
+    <rect x="394" y="92" width="104" height="50" rx="4" fill="#ffffff" stroke="#0b2e59" stroke-width="1.3"/>
+    <text x="446" y="114" text-anchor="middle" font-size="12" font-weight="600">api</text>
+    <text x="446" y="130" text-anchor="middle" font-size="10" fill="#5a5a5a">Node.js 24</text>
+    <line x1="498" y1="117" x2="522" y2="117" stroke="#333" stroke-width="1.2" marker-end="url(#f)"/>
+    <!-- postgres -->
+    <rect x="524" y="92" width="102" height="50" rx="4" fill="#ffffff" stroke="#0b2e59" stroke-width="1.3"/>
+    <text x="575" y="114" text-anchor="middle" font-size="12" font-weight="600">postgres</text>
+    <text x="575" y="130" text-anchor="middle" font-size="10" fill="#5a5a5a">PostgreSQL 16</text>
+    <!-- migrate -->
+    <rect x="394" y="38" width="104" height="38" rx="4" fill="#ffffff" stroke="#5a5a5a" stroke-dasharray="4 3"/>
+    <text x="446" y="55" text-anchor="middle" font-size="11" font-weight="600">migrate</text>
+    <text x="446" y="69" text-anchor="middle" font-size="9.5" fill="#5a5a5a">se ejecuta al arrancar</text>
+    <line x1="498" y1="60" x2="560" y2="90" stroke="#333" stroke-width="1.1" marker-end="url(#f)"/>
+    <!-- volumen -->
+    <line x1="575" y1="142" x2="575" y2="160" stroke="#5a5a5a" stroke-width="1.1"/>
+    <path d="M533,166 a42,6 0 0,0 84,0 v22 a42,6 0 0,1 -84,0 z" fill="#dfe6ef" stroke="#5a5a5a"/>
+    <ellipse cx="575" cy="166" rx="42" ry="6" fill="#eef2f7" stroke="#5a5a5a"/>
+    <text x="575" y="186" text-anchor="middle" font-size="9.5" fill="#333">volumen de datos</text>
+    <!-- red interna -->
+    <line x1="258" y1="168" x2="498" y2="168" stroke="#9aa5b4" stroke-dasharray="3 3"/>
+    <text x="258" y="184" font-size="9.5" fill="#5a5a5a">Red interna de Docker: api y postgres no publican puertos.</text>
+    <text x="258" y="198" font-size="9.5" fill="#5a5a5a">Solo el contenedor web recibe conexiones del proxy.</text>
+  </svg>
+</figure>
+
+<div class="cuadro">
+  <p class="titulo"><b>Cuadro 2.</b> Contenedores que componen el sistema.</p>
+  <table>
+    <thead><tr><th style="width:13%">Contenedor</th><th style="width:20%">Imagen base</th><th>Función</th><th style="width:17%">Puerto publicado</th></tr></thead>
+    <tbody>
+      <tr><td>web</td><td>nginx:1.28-alpine</td><td>Sirve el sitio web y reenvía las solicitudes de la ruta /api hacia la API. Comprime las respuestas y gestiona la caché de los archivos estáticos.</td><td>8080 (configurable)</td></tr>
+      <tr><td>api</td><td>node:24-alpine</td><td>Contiene la lógica del sistema. Se ejecuta con un usuario sin privilegios.</td><td>Ninguno</td></tr>
+      <tr><td>migrate</td><td>node:24-alpine</td><td>En cada arranque actualiza la estructura de la base de datos, si hace falta, y luego finaliza.</td><td>Ninguno</td></tr>
+      <tr><td>postgres</td><td>postgres:16-alpine</td><td>Base de datos. La información se conserva en un volumen persistente de Docker.</td><td>Ninguno</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="cuadro">
+  <p class="titulo"><b>Cuadro 3.</b> Tecnologías empleadas.</p>
+  <table>
+    <thead><tr><th style="width:26%">Componente</th><th>Tecnología</th></tr></thead>
+    <tbody>
+      <tr><td>Sitio web</td><td>React 19, compilado con Vite 8 en archivos estáticos (HTML, CSS y JavaScript)</td></tr>
+      <tr><td>API</td><td>Node.js 24 y Express 5, escrita en TypeScript</td></tr>
+      <tr><td>Base de datos</td><td>PostgreSQL 16. Utiliza funciones propias de este motor, por lo que no admite otro.</td></tr>
+      <tr><td>Servidor web</td><td>nginx 1.28</td></tr>
+      <tr><td>Empaquetado</td><td>Docker y Docker Compose</td></tr>
+    </tbody>
+  </table>
+  <p class="fuente">Todas las dependencias son de código abierto y se instalan con versiones fijadas.</p>
+</div>
+
+<p>El sitio y la API comparten un mismo origen: la API responde bajo la ruta /api del mismo dominio. Gracias a ello la sesión del personal funciona sin configuraciones adicionales entre dominios. Como consecuencia, el sistema debe ocupar la raíz de un dominio o subdominio y no puede publicarse dentro de una subcarpeta de otro sitio.</p>
+
+<!-- ============================== 6 ============================== -->
+<h2 id="s6">6. Requisitos de alojamiento</h2>
+
+<h3>6.1 Servidor</h3>
+<p>Se requiere una máquina virtual con los recursos del Cuadro 4. Los valores mínimos permiten el funcionamiento normal del sistema. Los recomendados dan holgura para construir las imágenes durante la instalación y las actualizaciones, que es el momento de mayor consumo.</p>
+
+<div class="cuadro">
+  <p class="titulo"><b>Cuadro 4.</b> Recursos de hardware.</p>
+  <table>
+    <thead><tr><th style="width:14%">Recurso</th><th style="width:14%">Mínimo</th><th style="width:15%">Recomendado</th><th>Justificación</th></tr></thead>
+    <tbody>
+      <tr><td>Procesador</td><td>1 vCPU</td><td>2 vCPU</td><td>La API atiende las solicitudes con un núcleo; el segundo agiliza la construcción de las imágenes.</td></tr>
+      <tr><td>Memoria</td><td>1 GB</td><td>2 GB</td><td>En operación, los contenedores consumen alrededor de 80 MB en reposo y menos de 200 MB bajo carga alta (sección 9).</td></tr>
+      <tr><td>Disco</td><td>10 GB</td><td>20 GB</td><td>Unos 2 GB para imágenes y caché de construcción, unos 10 MB para la base de datos y hasta 30 MB de registros por contenedor, más margen para el sistema operativo y los respaldos locales.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="cuadro">
+  <p class="titulo"><b>Cuadro 5.</b> Software requerido en el servidor.</p>
+  <table>
+    <thead><tr><th style="width:24%">Software</th><th style="width:26%">Versión</th><th>Observaciones</th></tr></thead>
+    <tbody>
+      <tr><td>Sistema operativo</td><td>Linux de 64 bits (x86-64)</td><td>Cualquier distribución con soporte para Docker.</td></tr>
+      <tr><td>Docker Engine</td><td>24 o superior</td><td>Probado con la versión 29.8. El servicio debe iniciar junto con el sistema operativo.</td></tr>
+      <tr><td>Docker Compose</td><td>Versión 2 (complemento docker compose)</td><td>Probado con la versión 5.5.</td></tr>
+      <tr><td>Git</td><td>Cualquier versión reciente</td><td>Para obtener y actualizar el código fuente.</td></tr>
+    </tbody>
+  </table>
+  <p class="fuente">No es necesario instalar Node.js, PostgreSQL ni nginx en el servidor: se incluyen en los contenedores.</p>
+</div>
+
+<h3>6.2 Red, dominio y certificados</h3>
+<div class="cuadro partible">
+  <p class="titulo"><b>Cuadro 6.</b> Requisitos de red.</p>
+  <table>
+    <thead><tr><th style="width:24%">Aspecto</th><th>Requisito</th></tr></thead>
+    <tbody>
+      <tr><td>Dominio</td><td>Un subdominio institucional (por ejemplo, localizador.biblioteca.tec.ac.cr, a definir por el DATIC) que apunte a la raíz del sistema.</td></tr>
+      <tr><td>Certificado HTTPS</td><td>Indispensable para el personal: la cookie de sesión solo se transmite por HTTPS. La búsqueda pública funciona también sin él. Se propone que el certificado y la terminación TLS los gestione el proxy inverso del DATIC.</td></tr>
+      <tr><td>Puertos</td><td>Entrada por el puerto 443 del proxy, que reenvía al puerto 8080 del servidor. Si el proxy reside en la misma máquina, el sistema puede escuchar únicamente en la interfaz local (127.0.0.1). Ningún otro puerto se expone.</td></tr>
+      <tr><td>Tamaño de solicitudes</td><td>El proxy debe aceptar solicitudes de hasta 6 MB, porque el personal carga planos de la sala de hasta 5 MB.</td></tr>
+      <tr><td>Salida a internet</td><td>Solo durante la instalación y las actualizaciones: Docker Hub (imágenes base), registry.npmjs.org (dependencias) y GitHub (código fuente). En operación normal el sistema no establece conexiones salientes.</td></tr>
+      <tr><td>Otros servicios</td><td>No requiere servidor de correo, servicios de terceros ni redes de distribución de contenido (CDN).</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================== 7 ============================== -->
+<h2 id="s7">7. Seguridad y protección de datos</h2>
+
+<h3>7.1 Datos almacenados</h3>
+<p>El sistema no recopila información del público lector: la búsqueda es anónima, no requiere identificación y no utiliza cookies. Los únicos datos personales corresponden al personal de la biblioteca con acceso al panel.</p>
+
+<div class="cuadro">
+  <p class="titulo"><b>Cuadro 7.</b> Información que almacena el sistema.</p>
+  <table>
+    <thead><tr><th style="width:30%">Información</th><th style="width:25%">Titular</th><th>Tratamiento</th></tr></thead>
+    <tbody>
+      <tr><td>Nombre, usuario y correo</td><td>Personal de la biblioteca</td><td>Se usan exclusivamente para el inicio de sesión.</td></tr>
+      <tr><td>Contraseña</td><td>Personal de la biblioteca</td><td>Se almacena solo su resumen criptográfico (argon2id con sal), nunca el texto original.</td></tr>
+      <tr><td>Sesiones activas</td><td>Personal de la biblioteca</td><td>Se guarda un resumen del identificador de sesión, con vencimiento a los siete días.</td></tr>
+      <tr><td>Estructura de la sala, rangos y planos</td><td>Biblioteca</td><td>Información operativa sin datos personales.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>7.2 Medidas implementadas</h3>
+<ul>
+  <li>Las contraseñas se protegen con argon2id, el algoritmo de resumen recomendado actualmente para este fin.</li>
+  <li>La sesión utiliza un identificador aleatorio de 256 bits en una cookie con los atributos HttpOnly, Secure y SameSite=Lax. Al cerrar la sesión, el identificador se invalida en el servidor.</li>
+  <li>Un intento fallido de inicio de sesión no revela si la cuenta existe.</li>
+  <li>Todas las solicitudes se validan antes de procesarse, y las consultas a la base de datos se construyen con parámetros, lo que previene la inyección de SQL.</li>
+  <li>Los planos SVG que se cargan se rechazan si contienen código ejecutable o enlaces externos, y se muestran con una política de seguridad de contenido que bloquea la ejecución de scripts.</li>
+  <li>La base de datos y la API solo aceptan conexiones de la red interna de Docker, y la API se ejecuta con un usuario sin privilegios.</li>
+  <li>La contraseña de la base de datos se define en un archivo de configuración del servidor (.env), que no forma parte del código fuente.</li>
+</ul>
+
+<h3>7.3 Recomendaciones al DATIC</h3>
+<ul>
+  <li>Limitar en el proxy inverso la cantidad de intentos de inicio de sesión por dirección IP, por ejemplo a diez por minuto en la ruta /api/auth/login, ya que el sistema aún no implementa ese control por sí mismo.</li>
+  <li>Reconstruir periódicamente las imágenes para incorporar los parches de seguridad de las imágenes base (Anexo A).</li>
+  <li>Tener en cuenta que todas las cuentas del personal poseen el mismo nivel de acceso al panel, pues el sistema no distingue roles.</li>
+</ul>
+
+<!-- ============================== 8 ============================== -->
+<h2 id="s8">8. Instalación, operación y mantenimiento</h2>
+
+<h3>8.1 Procedimiento de instalación</h3>
+<p>La instalación consta de cuatro pasos, que el responsable técnico puede ejecutar con acceso al servidor. Los comandos correspondientes se detallan en el Anexo A.</p>
+<ol>
+  <li>Obtener el código fuente del sistema en el servidor.</li>
+  <li>Crear el archivo de configuración con la contraseña de la base de datos y el puerto de escucha.</li>
+  <li>Construir e iniciar los contenedores. La primera vez el proceso tarda algunos minutos, y la estructura de la base de datos se crea automáticamente.</li>
+  <li>Crear las cuentas del personal de la biblioteca y cargar la información inicial de la sala.</li>
+</ol>
+
+<h3>8.2 Distribución de responsabilidades</h3>
+<p>Se propone la siguiente distribución de tareas entre el DATIC y el responsable técnico del sistema.</p>
+
+<div class="cuadro">
+  <p class="titulo"><b>Cuadro 8.</b> Responsabilidades propuestas.</p>
+  <table>
+    <thead><tr><th style="width:40%">Tarea</th><th style="width:18%">Responsable</th><th>Frecuencia</th></tr></thead>
+    <tbody>
+      <tr><td>Aprovisionar la máquina virtual, Docker, el dominio y el certificado</td><td>DATIC</td><td>Una vez</td></tr>
+      <tr><td>Mantener el sistema operativo y Docker actualizados</td><td>DATIC</td><td>Según sus políticas</td></tr>
+      <tr><td>Respaldar la base de datos y almacenar los respaldos fuera del servidor</td><td>DATIC</td><td>Diaria</td></tr>
+      <tr><td>Instalar el sistema y crear las cuentas del personal</td><td>Responsable técnico</td><td>Una vez y cuando se requiera</td></tr>
+      <tr><td>Instalar nuevas versiones del sistema</td><td>Responsable técnico</td><td>Con cada versión</td></tr>
+      <tr><td>Reconstruir las imágenes con los parches de seguridad</td><td>Responsable técnico o DATIC</td><td>Mensual</td></tr>
+      <tr><td>Mantener la información de la sala, los rangos y los planos</td><td>Personal de la biblioteca</td><td>Cuando cambie la sala</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>8.3 Respaldos y recuperación</h3>
+<p>Toda la información que no proviene del código fuente reside en la base de datos. Por lo tanto, un respaldo de la base basta para reconstruir el sistema completo en otro servidor. Con los datos actuales, un respaldo comprimido ocupa menos de 1 MB. Se recomienda una copia diaria, y otra adicional antes de cada actualización.</p>
+
+<h3>8.4 Continuidad y monitoreo</h3>
+<p>Los contenedores se reinician automáticamente si fallan o si se reinicia el servidor. Las actualizaciones aplican por sí mismas los cambios pendientes en la estructura de la base de datos antes de iniciar la API. Los registros de cada contenedor se rotan automáticamente, con un máximo de 30 MB por contenedor.</p>
+<p>Para el monitoreo, la dirección /api/health responde con el código 200 cuando el sistema funciona y alcanza la base de datos, y con el código 503 cuando no la alcanza. Si el DATIC cuenta con un sistema de monitoreo, se sugiere consultarla cada uno a cinco minutos.</p>
+
+<h3>8.5 Base de datos administrada por el DATIC</h3>
+<p>Si el DATIC prefiere ofrecer un servidor PostgreSQL 16 propio en lugar del contenedor de base de datos, el sistema lo admite: basta con prescindir de ese contenedor y configurar la cadena de conexión. La estructura de la base se crea igualmente de forma automática.</p>
+
+<!-- ============================== 9 ============================== -->
+<h2 id="s9">9. Pruebas de rendimiento y capacidad</h2>
+
+<p>Las mediciones se realizaron el 19 de octubre de 2026 sobre las imágenes de producción, con los datos reales de la sala general: 1941 ubicaciones y un plano de 830 KB. El equipo de prueba fue una computadora con Windows 11 y Docker Desktop, que tenía asignados 12 procesadores y 12 GB de memoria. En un servidor de menor capacidad el rendimiento será menor, pero el consumo de memoria se mantiene comparable.</p>
+
+<div class="cuadro">
+  <p class="titulo"><b>Cuadro 9.</b> Resultados de las mediciones.</p>
+  <table>
+    <thead><tr><th style="width:42%">Medición</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>Memoria en reposo</td><td>77 MB en total (API 39 MB, base de datos 27 MB, servidor web 11 MB)</td></tr>
+      <tr><td>Memoria máxima bajo carga</td><td>177 MB en total (API 108 MB, base de datos 51 MB, servidor web 18 MB)</td></tr>
+      <tr><td>Capacidad con 50 conexiones simultáneas durante 20 segundos</td><td>2400 búsquedas por segundo, sin errores</td></tr>
+      <tr><td>Tiempo de respuesta de una búsqueda</td><td>20 ms en la mediana y 38 ms en el percentil 99</td></tr>
+      <tr><td>Tamaño de la base de datos</td><td>9,8 MB</td></tr>
+      <tr><td>Tamaño de un respaldo comprimido</td><td>0,66 MB</td></tr>
+      <tr><td>Espacio de las imágenes de contenedor</td><td>API 264 MB, servidor web 95 MB, base de datos 420 MB</td></tr>
+      <tr><td>Datos transferidos en la primera visita de un lector</td><td>1,1 MB comprimidos; en visitas posteriores el navegador reutiliza su caché</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>La demanda esperada es de algunas decenas de personas usuarias simultáneas, muy inferior a la capacidad medida. El crecimiento de la base de datos también es reducido: cada nueva versión del mapa de la sala añade alrededor de 2 MB. Con base en estos resultados, una máquina virtual con los recursos recomendados del Cuadro 4 atiende la demanda prevista con amplio margen.</p>
+
+<!-- ============================== 10 ============================== -->
+<h2 id="s10">10. Solicitud al DATIC</h2>
+
+<p>Con fundamento en lo expuesto, se solicita respetuosamente al DATIC lo siguiente:</p>
+<ol>
+  <li>Una máquina virtual Linux de 64 bits con 2 vCPU, 2 GB de memoria y 20 GB de disco (como mínimo, 1 vCPU, 1 GB y 10 GB).</li>
+  <li>La instalación de Docker Engine y Docker Compose versión 2, con el servicio habilitado al inicio del sistema operativo.</li>
+  <li>Un subdominio institucional que apunte a la raíz del sistema, con certificado HTTPS y un proxy inverso hacia el puerto del sistema que admita solicitudes de hasta 6 MB.</li>
+  <li>Salida a internet desde el servidor hacia Docker Hub, registry.npmjs.org y GitHub, para la instalación y las actualizaciones.</li>
+  <li>Acceso remoto por SSH para el responsable técnico del sistema.</li>
+  <li>El respaldo diario de la base de datos, almacenado fuera del servidor.</li>
+  <li>De ser posible, la limitación de intentos de inicio de sesión por dirección IP en el proxy y el monitoreo de la dirección /api/health.</li>
+</ol>
+
+<p>Quedo a disposición para ampliar cualquier aspecto de este informe, coordinar la instalación o atender los requisitos adicionales que el DATIC considere necesarios.</p>
+
+<div class="firma">
+  Alexander Bonilla Figueroa<br>
+  Responsable técnico del sistema BJFF Book Locator<br>
+  Biblioteca José Figueres Ferrer, Instituto Tecnológico de Costa Rica<br>
+  alebonilla@estudiantec.cr
+</div>
+
+<!-- ============================== ANEXO A ============================== -->
+<h2 id="aA" class="nueva">Anexo A. Comandos de instalación y operación</h2>
+
+<p class="anexo-intro">Los comandos se ejecutan en la carpeta del código fuente, en el servidor. En los ejemplos, el archivo de configuración de los contenedores es docker-compose.prod.yaml.</p>
+
+<h3>A.1 Instalación</h3>
+<pre>cp .env.example .env
+# Editar .env y definir:
+#   POSTGRES_PASSWORD   contraseña de la base de datos (solo letras y números),
+#                       por ejemplo la salida de: openssl rand -hex 24
+#   WEB_PORT            8080, o 127.0.0.1:8080 si el proxy está en la misma máquina
+
+docker compose -f docker-compose.prod.yaml up -d --build</pre>
+
+<h3>A.2 Verificación</h3>
+<pre>docker compose -f docker-compose.prod.yaml ps     # api y postgres en estado "healthy"
+curl http://localhost:8080/api/health             # respuesta: {"status":"ok"}</pre>
+
+<h3>A.3 Operación</h3>
+<div class="cuadro">
+  <p class="titulo"><b>Cuadro A.1.</b> Comandos de operación. DC abrevia: docker compose -f docker-compose.prod.yaml</p>
+  <table>
+    <thead><tr><th style="width:30%">Tarea</th><th>Comando</th></tr></thead>
+    <tbody>
+      <tr><td>Consultar el estado</td><td class="mono">DC ps</td></tr>
+      <tr><td>Consultar los registros</td><td class="mono">DC logs -f api</td></tr>
+      <tr><td>Detener y volver a iniciar</td><td class="mono">DC down<br>DC up -d</td></tr>
+      <tr><td>Instalar una versión nueva</td><td class="mono">git pull<br>DC up -d --build</td></tr>
+      <tr><td>Aplicar parches de las imágenes base</td><td class="mono">DC build --pull<br>DC pull postgres<br>DC up -d</td></tr>
+      <tr><td>Respaldar la base de datos</td><td class="mono">DC exec -T postgres pg_dump -U bjff -Fc bjff_book_locator \<br>&nbsp;&nbsp;&gt; respaldo.dump</td></tr>
+      <tr><td>Restaurar un respaldo</td><td class="mono">DC exec -T postgres pg_restore -U bjff -d bjff_book_locator \<br>&nbsp;&nbsp;--clean --if-exists &lt; respaldo.dump</td></tr>
+    </tbody>
+  </table>
+  <p class="fuente">Advertencia: el comando DC down -v elimina también el volumen con la base de datos; solo debe usarse para reinstalar desde cero.</p>
+</div>
+
+<!-- ============================== ANEXO B ============================== -->
+<h2 id="aB">Anexo B. Ejemplo de configuración del proxy inverso</h2>
+
+<p class="anexo-intro">Ejemplo de referencia en caso de que el proxy del DATIC utilice nginx y resida en la misma máquina que el sistema. El nombre del servidor y los certificados deben ajustarse a los institucionales.</p>
+<pre>server {
+    listen 443 ssl;
+    server_name localizador.biblioteca.tec.ac.cr;
+    ssl_certificate     /ruta/al/certificado.pem;
+    ssl_certificate_key /ruta/a/la/llave.pem;
+
+    client_max_body_size 6m;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}</pre>
+
+</body>
+</html>
