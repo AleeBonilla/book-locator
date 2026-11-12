@@ -6,10 +6,10 @@ services:
     name: bjff-book-locator-api
     runtime: node
     plan: free
-    # --include=dev: con NODE_ENV=production npm omitiría TypeScript, que hace
-    # falta para compilar. El postinstall de la raíz compila
-    # @bjff/classification.
-    buildCommand: npm ci --include=dev && npm run build -w api
+    # corepack usa la versión de pnpm fijada en "packageManager". --prod=false:
+    # con NODE_ENV=production pnpm omitiría TypeScript, que hace falta para
+    # compilar. El postinstall de la raíz compila @bjff/classification.
+    buildCommand: corepack pnpm install --frozen-lockfile --prod=false && corepack pnpm --filter api build
     startCommand: node apps/api/dist/index.js
     healthCheckPath: /health
     autoDeploy: true

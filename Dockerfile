@@ -11,34 +11,44 @@
 FROM node:24-alpine AS build
 WORKDIR /app
 
+# corepack trae la versión de pnpm fijada en "packageManager" (package.json).
+RUN corepack enable
+
 # Primero solo los manifiestos: mientras no cambien, Docker reutiliza la capa
-# de `npm ci` aunque cambie el código.
-COPY package.json package-lock.json ./
+# de `pnpm install` aunque cambie el código.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/classification/package.json packages/classification/
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 
-# `npm ci` instala exactamente lo que dice package-lock.json. --ignore-scripts
-# evita el postinstall de la raíz (compilar @bjff/classification), que todavía
-# no tiene su código; se compila abajo junto con la API y la web.
-RUN npm ci --ignore-scripts
+# --frozen-lockfile instala exactamente lo que dice pnpm-lock.yaml (falla si no
+# coincide con los package.json). --ignore-scripts evita el postinstall de la
+# raíz (compilar @bjff/classification), que todavía no tiene su código; se
+# compila abajo junto con la API y la web. Los scripts de argon2 y esbuild
+# (allowBuilds) sí hacen falta, así que se corren aparte con `pnpm rebuild`.
+RUN pnpm install --frozen-lockfile --ignore-scripts && pnpm rebuild argon2 esbuild
 
 COPY packages/ packages/
 COPY apps/ apps/
-RUN npm run build
+RUN pnpm build
 
 # --- api-deps: solo las dependencias de producción de la API ----------------
 FROM node:24-alpine AS api-deps
 WORKDIR /app
-COPY package.json package-lock.json ./
+RUN corepack enable
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/classification/package.json packages/classification/
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 
-# --omit=dev deja fuera TypeScript, tsx y los @types/*, que solo hacen falta
-# para compilar; -w api, las dependencias de la web (React, Vite…). El
-# mkdir asegura que exista la carpeta que copia la etapa api.
-RUN npm ci --omit=dev --ignore-scripts -w api && mkdir -p apps/api/node_modules
+# --prod deja fuera TypeScript, tsx y los @types/*, que solo hacen falta para
+# compilar; --filter "api..." instala solo la API y lo que ella usa
+# (@bjff/classification), sin las dependencias de la web (React, Vite…).
+# pnpm deja los paquetes en node_modules/.pnpm y enlaces simbólicos relativos
+# en cada node_modules; COPY los conserva, así que la etapa api copia ambos.
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts --filter "api..." \
+ && pnpm rebuild argon2 \
+ && mkdir -p apps/api/node_modules
 
 # --- api ---------------------------------------------------------------------
 FROM node:24-alpine AS api
