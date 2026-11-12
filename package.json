@@ -2,15 +2,12 @@
   "name": "bjff-book-locator",
   "private": true,
   "description": "Localizador de libros de la Biblioteca José Figueres Ferrer (TEC)",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
   "scripts": {
-    "postinstall": "npm run build -w @bjff/classification",
-    "dev:api": "npm run dev -w api",
-    "dev:web": "npm run dev -w bjff-book-locator-web",
-    "test": "npm test -w @bjff/classification -w api",
-    "build": "npm run build -w @bjff/classification -w api -w bjff-book-locator-web"
-  }
+    "postinstall": "pnpm --filter @bjff/classification build",
+    "dev:api": "pnpm --filter api dev",
+    "dev:web": "pnpm --filter bjff-book-locator-web dev",
+    "test": "pnpm --filter @bjff/classification --filter api test",
+    "build": "pnpm --filter @bjff/classification --filter api --filter bjff-book-locator-web build"
+  },
+  "packageManager": "pnpm@11.26.0"
 }

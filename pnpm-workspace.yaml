@@ -1,0 +1,9 @@
+packages:
+  - packages/*
+  - apps/*
+
+# pnpm no corre scripts de instalación de dependencias salvo los aprobados aquí:
+# argon2 trae el binario nativo del hash de contraseñas; esbuild, el de tsx y Vite.
+allowBuilds:
+  argon2: true
+  esbuild: true
