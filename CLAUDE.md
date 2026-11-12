@@ -14,7 +14,7 @@ Proyecto en español (documentación, comentarios y mensajes de commit). API en 
 ## Documentos de referencia
 
 - `docs/normalization.md` y `docs/classification-ordering.md` son el contrato del parser de códigos (`packages/classification`, paquete `@bjff/classification` que usan la API y la web). Si cambia una regla, se actualizan el documento, la implementación y sus pruebas en el mismo cambio.
-- Monorepo con npm workspaces (`packages/*`, `apps/*`): `npm install` se corre una sola vez en la raíz. `npm test` en la raíz prueba el paquete y la API; dentro de `apps/api`, solo la API.
+- Monorepo con pnpm workspaces (`packages/*`, `apps/*`): `pnpm install` se corre una sola vez en la raíz. `pnpm test` en la raíz prueba el paquete y la API; dentro de `apps/api`, solo la API.
 
 ## Objetivos de aprendizaje del usuario
 

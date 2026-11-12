@@ -20,7 +20,7 @@ import { createScheme, lockEditableScheme, refreshSchemeStatus } from "../scheme
 //
 // Luego lo publica y, con --activate, lo pone en uso en la búsqueda pública.
 //
-//   npm run seed-demo -w api -- --user ana --activate
+//   pnpm --filter api seed-demo --user ana --activate
 //
 // Sin --user usa el primer usuario habilitado. Con DATABASE_URL carga la demo
 // en esa base (p. ej. la de producción en Neon).
@@ -81,7 +81,7 @@ async function findUser(username: string | undefined): Promise<number> {
   );
   if (!rows[0]) {
     throw new Error(
-      username ? `No existe el usuario ${username}` : "No hay usuarios: créelo antes con npm run create-user -w api",
+      username ? `No existe el usuario ${username}` : "No hay usuarios: créelo antes con pnpm --filter api create-user",
     );
   }
   return rows[0].user_id;

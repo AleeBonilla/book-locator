@@ -99,7 +99,7 @@ Las mediciones están en el [informe de alojamiento](informe-alojamiento.md#7-me
 | ID | Requerimiento | Implementación |
 |---|---|---|
 | RNF-15 | El código está tipado de punta a punta (TypeScript) y las reglas de los códigos viven en un solo paquete, compartido por la API y la web. | `packages/classification` |
-| RNF-16 | Hay pruebas automáticas del paquete y de la API: 113 casos en 12 archivos, que corren contra una base PostgreSQL real. | `npm test` |
+| RNF-16 | Hay pruebas automáticas del paquete y de la API: 113 casos en 12 archivos, que corren contra una base PostgreSQL real. | `pnpm test` |
 | RNF-17 | Las decisiones de diseño quedan documentadas, y los cambios a la base van en migraciones numeradas que no se editan. | `docs/decisions/`, `database/NNN-*.sql` |
 | RNF-18 | El sistema se instala en cualquier servidor con Docker, o en servicios gratuitos, con el mismo código. | [`instalacion-docker.md`](instalacion-docker.md), [`despliegue.md`](despliegue.md) |
 

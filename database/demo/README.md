@@ -10,11 +10,11 @@ Esquema de la sala general de la BJFF con rangos reales del inventario, limpiado
 Para crear el esquema, publicarlo y ponerlo en uso:
 
 ```sh
-npm run seed-demo -w api -- --activate            # base local
-DATABASE_URL='postgres://…' npm run seed-demo -w api -- --activate   # p. ej. Neon
+pnpm --filter api seed-demo --activate            # base local
+DATABASE_URL='postgres://…' pnpm --filter api seed-demo --activate   # p. ej. Neon
 ```
 
-Necesita al menos un usuario (`npm run create-user -w api`): el esquema queda a su nombre. Con `--user <usuario>` se elige cuál, y con `--name` se cambia el nombre del esquema (por defecto, «Sala general (demo)»). Cada ejecución crea un esquema nuevo.
+Necesita al menos un usuario (`pnpm --filter api create-user`): el esquema queda a su nombre. Con `--user <usuario>` se elige cuál, y con `--name` se cambia el nombre del esquema (por defecto, «Sala general (demo)»). Cada ejecución crea un esquema nuevo.
 
 ## De dónde salen los datos
 

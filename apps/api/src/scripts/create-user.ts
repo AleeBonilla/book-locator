@@ -4,7 +4,7 @@ import { parseArgs } from "node:util";
 import { pool } from "../db.js";
 import { hashPassword } from "../auth/password.js";
 
-// Uso: npm run create-user -- --username ana --email ana@example.com --name "Ana Pérez"
+// Uso: pnpm create-user --username ana --email ana@example.com --name "Ana Pérez"
 // La contraseña se pide por teclado (sin mostrarse), para que no quede en el
 // historial de la terminal ni en la lista de procesos.
 const { values } = parseArgs({
@@ -16,7 +16,7 @@ const { values } = parseArgs({
 });
 
 if (!values.username || !values.email || !values.name) {
-  console.error('Uso: npm run create-user -- --username <usuario> --email <correo> --name "<nombre completo>"');
+  console.error('Uso: pnpm create-user --username <usuario> --email <correo> --name "<nombre completo>"');
   process.exit(1);
 }
 

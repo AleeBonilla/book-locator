@@ -7,13 +7,13 @@ import { pool, withTransaction } from "../db.js";
 // schema_migrations. Sirve para bases que no crea docker-compose, como la de
 // producción en Neon:
 //
-//   DATABASE_URL="postgres://…" npm run migrate -w api
+//   DATABASE_URL="postgres://…" pnpm --filter api migrate
 //
 // La base local de Docker ya tiene aplicadas las migraciones (las corre
 // docker-compose al crearla) pero sin anotarlas. --baseline las anota sin
 // ejecutarlas, una sola vez:
 //
-//   npm run migrate -w api -- --baseline
+//   pnpm --filter api migrate --baseline
 const { values } = parseArgs({ options: { baseline: { type: "boolean", default: false } } });
 
 const directory = new URL("../../../../database/", import.meta.url);

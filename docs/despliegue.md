@@ -4,7 +4,7 @@ La aplicación se despliega en tres servicios con plan gratuito:
 
 | Pieza | Servicio | Configuración |
 |---|---|---|
-| Base de datos | [Neon](https://neon.tech) (PostgreSQL) | Se migra desde la máquina local con `npm run migrate -w api`. |
+| Base de datos | [Neon](https://neon.tech) (PostgreSQL) | Se migra desde la máquina local con `pnpm --filter api migrate`. |
 | API | [Render](https://render.com) (web service) | [`render.yaml`](../render.yaml) |
 | Web | [Vercel](https://vercel.com) | [`apps/web/vercel.json`](../apps/web/vercel.json) |
 
@@ -29,17 +29,17 @@ La cadena incluye la contraseña: no va en el repositorio ni en archivos version
 
 ## 2. Migraciones y primer usuario
 
-Desde la máquina local, en la raíz del repositorio y con las dependencias instaladas (`npm install`):
+Desde la máquina local, en la raíz del repositorio y con las dependencias instaladas (`pnpm install`):
 
 ```sh
 export DATABASE_URL='postgres://…?sslmode=require'   # la cadena de Neon
 
-npm run migrate -w api      # aplica database/001…005 y las anota en schema_migrations
-npm run create-user -w api -- --username ana --email ana@example.com --name "Ana Pérez"
-npm run seed-demo -w api -- --activate   # opcional: la sala general de demostración
+pnpm --filter api migrate      # aplica database/001…005 y las anota en schema_migrations
+pnpm --filter api create-user --username ana --email ana@example.com --name "Ana Pérez"
+pnpm --filter api seed-demo --activate   # opcional: la sala general de demostración
 ```
 
-`create-user` pide la contraseña por teclado. `seed-demo` crea, publica y pone en uso un esquema con la estructura del plano y los rangos limpios del inventario ([datos de demostración](../database/demo/README.md)); sin él, la búsqueda pública responde «no está disponible» hasta que se active un esquema desde el panel. Cuando haya migraciones nuevas, se vuelve a correr `npm run migrate -w api` con la misma variable: solo aplica las pendientes.
+`create-user` pide la contraseña por teclado. `seed-demo` crea, publica y pone en uso un esquema con la estructura del plano y los rangos limpios del inventario ([datos de demostración](../database/demo/README.md)); sin él, la búsqueda pública responde «no está disponible» hasta que se active un esquema desde el panel. Cuando haya migraciones nuevas, se vuelve a correr `pnpm --filter api migrate` con la misma variable: solo aplica las pendientes.
 
 Para dejar de usar Neon en la terminal, `unset DATABASE_URL`: sin ella, la API vuelve a usar la base local (`DB_*` de `apps/api/.env`).
 
@@ -52,7 +52,7 @@ Para dejar de usar Neon en la terminal, `unset DATABASE_URL`: sin ella, la API v
 
 Qué hace `render.yaml`:
 
-- Instala con `npm ci --include=dev`: sin esa opción, con `NODE_ENV=production` npm omitiría TypeScript, que hace falta para compilar.
+- Instala con `pnpm install --frozen-lockfile --prod=false` (vía `corepack`, con la versión fijada en `packageManager`): sin `--prod=false`, con `NODE_ENV=production` pnpm omitiría TypeScript, que hace falta para compilar.
 - Compila el paquete compartido (el `postinstall` de la raíz) y la API, y arranca `node apps/api/dist/index.js`.
 - Con `NODE_ENV=production`, la cookie de sesión lleva `Secure`: solo viaja por HTTPS.
 
@@ -61,7 +61,7 @@ Si Render le asigna al servicio otra dirección (por ejemplo, porque el nombre y
 ## 4. Web en Vercel
 
 1. En Vercel: **Add New → Project**, importar el repositorio.
-2. En **Root Directory**, elegir `apps/web`. Vercel detecta que es parte de un monorepo con npm workspaces e instala desde la raíz.
+2. En **Root Directory**, elegir `apps/web`. `vercel.json` instala con `corepack pnpm install`, que desde `apps/web` instala todo el workspace (y el postinstall de la raíz compila `@bjff/classification`).
 3. Dejar el resto como viene: `vercel.json` ya indica el framework (Vite), el comando de compilación y la carpeta `dist`.
 4. Desplegar y abrir la dirección que asigna Vercel (`https://<proyecto>.vercel.app`).
 

@@ -23,7 +23,7 @@ Solo `web` publica un puerto en el servidor. La base y la API únicamente acepta
 
 - Linux de 64 bits (probado en x86-64) con **Docker Engine** y el complemento **Docker Compose v2** (`docker compose`).
 - **Git**, para clonar el repositorio. Las imágenes se construyen en el propio servidor, así que no hace falta instalar Node ni PostgreSQL.
-- Acceso a internet durante la construcción: Docker descarga las imágenes base y npm descarga las dependencias.
+- Acceso a internet durante la construcción: Docker descarga las imágenes base y pnpm descarga las dependencias.
 - **HTTPS delante de la web.** La cookie de sesión lleva el atributo `Secure`, así que el navegador solo la envía por HTTPS. Sin HTTPS, la búsqueda pública funciona, pero no se puede iniciar sesión en el panel. La excepción es `http://localhost`, que los navegadores tratan como seguro.
 
 Los requisitos de hardware y de red están en el informe técnico.

@@ -13,25 +13,25 @@ Localizador de libros de la Biblioteca José Figueres Ferrer (Tecnológico de Co
 | `docker` | Configuración de nginx para la imagen de producción de la web ([`Dockerfile`](Dockerfile)). |
 | `docs` | Referencia de la API, reglas de los códigos, guía para dibujar planos y decisiones. |
 
-Es un monorepo con [npm workspaces](https://docs.npmjs.com/cli/using-npm/workspaces): hay un solo `package-lock.json` y un solo `node_modules`, en la raíz.
+Es un monorepo con [pnpm workspaces](https://pnpm.io/workspaces) (`pnpm-workspace.yaml`): hay un solo `pnpm-lock.yaml`, en la raíz. La versión de pnpm está fijada en `packageManager` (`package.json`); `corepack enable` la instala.
 
 ## Desarrollo
 
-Requisitos: Node 24 y Docker.
+Requisitos: Node 24 (con `corepack enable` para pnpm) y Docker.
 
 ```sh
-npm install                      # en la raíz; también compila @bjff/classification
+pnpm install                     # en la raíz; también compila @bjff/classification
 docker compose up -d             # PostgreSQL 16 con las migraciones
 cp apps/api/.env.example apps/api/.env   # DB_PASSWORD: la de docker-compose.yaml
-npm run create-user -w api -- --username ana --email ana@example.com --name "Ana Pérez"
-npm run seed-demo -w api -- --activate   # opcional: esquema de demostración (database/demo)
+pnpm --filter api create-user --username ana --email ana@example.com --name "Ana Pérez"
+pnpm --filter api seed-demo --activate   # opcional: esquema de demostración (database/demo)
 ```
 
 Después, en dos terminales:
 
 ```sh
-npm run dev:api                  # API en http://localhost:3000
-npm run dev:web                  # web en http://localhost:5173
+pnpm dev:api                     # API en http://localhost:3000
+pnpm dev:web                     # web en http://localhost:5173
 ```
 
 La web llama a la API en `/api` y Vite reenvía esas peticiones a `localhost:3000` (`API_URL` cambia el destino). Al ser el mismo origen, la cookie de sesión funciona sin configurar CORS.
@@ -41,9 +41,9 @@ En desarrollo, la API y la web usan el código fuente de `@bjff/classification` 
 ## Pruebas y compilación
 
 ```sh
-npm test                         # paquete y API (la API necesita la base levantada)
-npm run lint -w bjff-book-locator-web
-npm run build                    # paquete, API (apps/api/dist) y web (apps/web/dist)
+pnpm test                        # paquete y API (la API necesita la base levantada)
+pnpm --filter bjff-book-locator-web lint
+pnpm build                       # paquete, API (apps/api/dist) y web (apps/web/dist)
 ```
 
 ## Despliegue
